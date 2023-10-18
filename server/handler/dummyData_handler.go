@@ -26,7 +26,7 @@ func AddDummyDataHandler() {
 	}{
 		{"cars", "server/dummyData/car.json", &[]model.Car{}},
 		{"part_customizations", "server/dummyData/partCustomization.json", &[]model.PartCustomization{}},
-		{"default_customizations", "server/dummyData/defaultCustomization.json", &[]model.DefualtCustomisation{}},
+		{"default_customisations", "server/dummyData/defaultCustomization.json", &[]model.DefaultCustomisation{}},
 		{"race_types", "server/dummyData/raceTypes.json", &[]model.RaceTypes{}},
 		{"race_rewards", "server/dummyData/rewards.json", &[]model.RaceRewards{}},
 		{"rating_multis", "server/dummyData/classMultiplier.json", &[]model.RatingMulti{}},
@@ -64,7 +64,7 @@ func addtoDb(filePath string, modelType interface{}) {
 			fmt.Println("part customization data:", item)
 			db.CreateRecord(&item)
 		}
-	case *[]model.DefualtCustomisation:
+	case *[]model.DefaultCustomisation:
 		for _, item := range *slice {
 			fmt.Println("default customization data:", item)
 			db.CreateRecord(&item)

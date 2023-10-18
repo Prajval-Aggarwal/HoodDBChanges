@@ -18,20 +18,9 @@ func AddGarageService(ctx *gin.Context, addGarageReq request.AddGarageRequest) {
 	// Check if a garage already exists at the specified latitude and longitude.
 	var exists bool
 
-	query := "SELECT EXISTS (SELECT * FROM garage_types WHERE type_id=?)"
-	err := db.QueryExecutor(query, &exists, addGarageReq.GarageType)
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-		return
-	}
-	if !exists {
-		response.ShowResponse(utils.GARAGE_TYPE_NOT_VALILD, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-		return
-	}
-
 	//check that no two same garages are on same locations
-	query = "SELECT EXISTS (SELECT * FROM garages WHERE latitude=? AND longitude=?)"
-	err = db.QueryExecutor(query, &exists, addGarageReq.Latitude, addGarageReq.Longitude)
+	query := "SELECT EXISTS (SELECT * FROM garages WHERE latitude=? AND longitude=?)"
+	err := db.QueryExecutor(query, &exists, addGarageReq.Latitude, addGarageReq.Longitude)
 	if err != nil {
 		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 		return
@@ -46,6 +35,7 @@ func AddGarageService(ctx *gin.Context, addGarageReq request.AddGarageRequest) {
 	capacity := int64(math.Round(float64(addGarageReq.GarageType)/2 + float64(addGarageReq.Rarity)/2))
 
 	//	var newGarage model.Garage
+
 	newGarage := model.Garage{
 		GarageName:    addGarageReq.GarageName,
 		Latitude:      addGarageReq.Latitude,
@@ -221,22 +211,8 @@ func GetGarageTypes(ctx *gin.Context) {
 	// Get the query parameters for skip and limit from the request
 
 	// Build the SQL query with skip and limit
-	query := "SELECT * FROM garage_types ORDER BY type_id"
 
-	err := db.QueryExecutor(query, &garageTypeList)
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	var totalCount int
-	countQuery := "SELECT COUNT(*) FROM garage_types"
-	err = db.QueryExecutor(countQuery, &totalCount)
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-		return
-	}
-	dataresp.TotalCount = totalCount
+	dataresp.TotalCount = len(garageTypeList)
 	dataresp.Data = garageTypeList
 
 	response.ShowResponse(utils.GARAGE_LIST_FETCHED, utils.HTTP_OK, utils.SUCCESS, dataresp, ctx)
@@ -283,23 +259,7 @@ func GetRarity(ctx *gin.Context) {
 	var dataresp response.DataResponse
 	// Get the query parameters for skip and limit from the request
 
-	// Build the SQL query with skip and limit
-	query := "SELECT * FROM rarities ORDER BY rarity_id"
-
-	err := db.QueryExecutor(query, &rarityList)
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	var totalCount int
-	countQuery := "SELECT COUNT(*) FROM rarities"
-	err = db.QueryExecutor(countQuery, &totalCount)
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-		return
-	}
-	dataresp.TotalCount = totalCount
+	dataresp.TotalCount = len(rarityList)
 	dataresp.Data = rarityList
 
 	response.ShowResponse(utils.GARAGE_LIST_FETCHED, utils.HTTP_OK, utils.SUCCESS, dataresp, ctx)

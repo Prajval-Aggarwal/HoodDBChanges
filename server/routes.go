@@ -32,6 +32,7 @@ func ConfigureRoutes(server *Server) {
 	server.engine.PUT("/admin/garage/update", gateway.AdminAuthorization, admin.UpdateGarageHandler)
 	server.engine.GET("/garage/types", admin.GetGarageTypesHandler)
 	server.engine.GET("/garage/rarity", admin.GetRarityHandler)
+	server.engine.GET("/garages/get-all", admin.GetAllGarageListHandler)
 
 	//Admin Battle Arena Routes
 	server.engine.POST("/admin/arena", gateway.AdminAuthorization, admin.AddArenaHandler)

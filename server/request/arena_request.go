@@ -14,7 +14,7 @@ type AddArenaRequest struct {
 func (a AddArenaRequest) Validate() error {
 	return validation.ValidateStruct(&a,
 		validation.Field(&a.ArenaName, validation.Required),
-		validation.Field(&a.Latitude, validation.Required),
+		validation.Field(&a.ArenaLevel, validation.Required, validation.Min(1), validation.Max(3)),
 		// Validate Latitude: must be between -90 and 90 degrees
 		validation.Field(&a.Latitude, validation.Required, validation.Min(-90.0), validation.Max(90.0)),
 		// Validate Longitude: must be between -180 and 180 degrees

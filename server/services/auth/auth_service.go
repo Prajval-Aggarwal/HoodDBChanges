@@ -57,19 +57,14 @@ func GuestLoginService(ctx *gin.Context, guestLoginRequest request.GuestLoginReq
 			return
 		}
 
-		// Create player and race history records in the database.
+		// Create player and race stats records in the database.
 		err = db.CreateRecord(&playerRecord)
 		if err != nil {
 			response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
 			return
 		}
 		playerRaceHist := model.PlayerRaceStats{
-			PlayerId:         playerUUID,
-			DistanceTraveled: 0,
-			ShdWon:           0,
-			TotalShdPlayed:   0,
-			TdWon:            0,
-			TotalTdPlayed:    0,
+			PlayerId: playerUUID,
 		}
 		err = db.CreateRecord(&playerRaceHist)
 		if err != nil {
@@ -77,7 +72,8 @@ func GuestLoginService(ctx *gin.Context, guestLoginRequest request.GuestLoginReq
 			return
 		}
 
-		// //give a car to that player
+		//give a car to that player
+
 		// newCarRecord := model.OwnedCars{
 		// 	PlayerId: playerUUID,
 		// 	CarId:    "Hood_car_05",
@@ -103,6 +99,7 @@ func GuestLoginService(ctx *gin.Context, guestLoginRequest request.GuestLoginReq
 			SessionType: utils.GuestLogin,
 			PlayerId:    playerUUID,
 			Token:       *accessToken,
+			DeviceId:    guestLoginRequest.DeviceId,
 		}
 		err = db.CreateRecord(&session)
 		if err != nil {

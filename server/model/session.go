@@ -5,6 +5,7 @@ type Session struct {
 	SessionId   string `json:"sessionId" gorm:"default:uuid_generate_v4()"`
 	PlayerId    string `json:"userId" `
 	SessionType int64  `json:"sessionType"`
+	DeviceId    string `json:"deviceId"`
 	Token       string `json:"token"`
 }
 

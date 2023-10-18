@@ -23,21 +23,9 @@ func AddArenaService(ctx *gin.Context, addArenaReq request.AddArenaRequest) {
 	//	var newArena model.Arena
 
 	var exists bool
-
-	query := "SELECT EXISTS (SELECT * FROM arena_levels WHERE type_id=?)"
-	err := db.QueryExecutor(query, &exists, addArenaReq.ArenaLevel)
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-		return
-	}
-	if !exists {
-		response.ShowResponse(utils.ARENA_LEVEL_NOT_VALID, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-		return
-	}
-
 	//check that no two same Arenas are on same locations
-	query = "SELECT EXISTS (SELECT * FROM arenas WHERE latitude=? AND longitude=?)"
-	err = db.QueryExecutor(query, &exists, addArenaReq.Latitude, addArenaReq.Longitude)
+	query := "SELECT EXISTS (SELECT * FROM arenas WHERE latitude=? AND longitude=?)"
+	err := db.QueryExecutor(query, &exists, addArenaReq.Latitude, addArenaReq.Longitude)
 	if err != nil {
 		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 		return
@@ -76,14 +64,8 @@ func AddArenaService(ctx *gin.Context, addArenaReq request.AddArenaRequest) {
 	// }
 
 	aiOwnedArena := model.PlayerRaceStats{
-		PlayerId:         AIId,
-		ArenaId:          &newArena.ArenaId,
-		LoseStreak:       0,
-		DistanceTraveled: 0,
-		ShdWon:           0,
-		TotalShdPlayed:   0,
-		TdWon:            0,
-		TotalTdPlayed:    0,
+		PlayerId: AIId,
+		ArenaId:  &newArena.ArenaId,
 	}
 	if newArena.ArenaLevel == int64(utils.EASY) {
 		aiOwnedArena.WinStreak = utils.EASY_ARENA_SERIES
@@ -151,14 +133,14 @@ func DeleteArenaService(ctx *gin.Context, deleteReq request.DeletArenaReq) {
 	//validate the Arena id
 
 	var role string
-	query := "SELECT role FROM players p JOIN owned_battle_arenas oba ON oba.player_id=p.player_id WHERE oba.arena_id=? ORDER BY oba.updated_at DESC"
+	query := "SELECT role FROM players p JOIN player_race_stats oba ON oba.player_id=p.player_id WHERE oba.arena_id=?"
 
 	err := db.QueryExecutor(query, &role, deleteReq.ArenaId)
 	if err != nil {
 		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 		return
 	}
-
+	fmt.Println("Role is", role)
 	if role != "ai" {
 		response.ShowResponse("Arena is owned by players. Unable to delete the arena", utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
 		return
@@ -286,23 +268,7 @@ func GetArenaTypes(ctx *gin.Context) {
 	var dataresp response.DataResponse
 	// Get the query parameters for skip and limit from the request
 
-	// Build the SQL query with skip and limit
-	query := "SELECT * FROM arena_levels ORDER BY type_id "
-
-	err := db.QueryExecutor(query, &arenaTypeList)
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	var totalCount int
-	countQuery := "SELECT COUNT(*) FROM arena_levels"
-	err = db.QueryExecutor(countQuery, &totalCount)
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-		return
-	}
-	dataresp.TotalCount = totalCount
+	dataresp.TotalCount = len(arenaTypeList)
 	dataresp.Data = arenaTypeList
 
 	response.ShowResponse(utils.DATA_FETCH_SUCCESS, utils.HTTP_OK, utils.SUCCESS, dataresp, ctx)
@@ -314,7 +280,7 @@ func GiveRandomCar(playerId string, arenaId string, min int64, max int64, slots 
 	for i := 0; i < slots; i++ {
 		var car carDetails
 		query := `
-		SELECT car_id,ovr FROM car_stats
+		SELECT car_id,ovr FROM default_customisations
 		WHERE car_id = (
 					SELECT car_id FROM cars
 					WHERE class >= ? AND class <= ?

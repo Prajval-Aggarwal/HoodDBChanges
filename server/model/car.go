@@ -9,7 +9,7 @@ type Car struct {
 	Class      int64   `json:"class,omitempty"`
 	Locked     bool    `json:"locked,omitempty"`
 }
-type DefualtCustomisation struct {
+type DefaultCustomisation struct {
 	CarId         string  `json:"carId,omitempty"`
 	Car           Car     `json:"-" gorm:"references:CarId;constraint:OnDelete:CASCADE"`
 	Power         int64   `json:"power,omitempty"`

@@ -58,15 +58,7 @@ func AddAiToDB() {
 				return
 			}
 			playerRaceHist := model.PlayerRaceStats{
-				PlayerId:         playerUUID,
-				ArenaId:          nil,
-				WinStreak:        0,
-				LoseStreak:       0,
-				DistanceTraveled: 0,
-				ShdWon:           0,
-				TotalShdPlayed:   0,
-				TdWon:            0,
-				TotalTdPlayed:    0,
+				PlayerId: playerUUID,
 			}
 			err = db.CreateRecord(&playerRaceHist)
 			if err != nil {
