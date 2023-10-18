@@ -16,7 +16,7 @@ func AutoMigrateDatabase(db *gorm.DB) {
 	}
 	fmt.Println("db version is:", dbVersion.Version)
 	if dbVersion.Version < 1 {
-		err := db.AutoMigrate(&model.User{})
+		err := db.AutoMigrate(&model.Player{}, &model.OwnedCars{}, &model.Car{}, &model.Garage{}, &model.GarageCars{}, &model.OwnedGarage{}, &model.RatingMulti{})
 		if err != nil {
 			panic(err)
 		}
@@ -25,27 +25,127 @@ func AutoMigrateDatabase(db *gorm.DB) {
 		})
 		dbVersion.Version = 1
 	}
-	// if dbVersion.Version < 2 {
-	// 	err := db.AutoMigrate(&model.Slot{})
+	if dbVersion.Version < 2 {
+		err := db.AutoMigrate(&model.PartCustomization{}, &model.DefualtCustomisation{}, &model.PlayerCarCustomisation{})
+		if err != nil {
+			panic(err)
+		}
+		db.Where("version=?", dbVersion.Version).Updates(&model.DbVersion{
+			Version: 2,
+		})
+		dbVersion.Version = 2
+	}
+	if dbVersion.Version < 3 {
+		err := db.AutoMigrate(&model.PartCustomization{}, &model.DefualtCustomisation{}, &model.PlayerCarCustomisation{})
+		if err != nil {
+			panic(err)
+		}
+		db.Where("version=?", dbVersion.Version).Updates(&model.DbVersion{
+			Version: 3,
+		})
+		dbVersion.Version = 3
+	}
+	if dbVersion.Version < 4 {
+		err := db.AutoMigrate(&model.PlayerRaceStats{}, &model.Admin{})
+		if err != nil {
+			panic(err)
+		}
+		db.Where("version=?", dbVersion.Version).Updates(&model.DbVersion{
+			Version: 4,
+		})
+		dbVersion.Version = 4
+	}
+	if dbVersion.Version < 5 {
+		err := db.AutoMigrate(&model.ResetSession{}, &model.Arena{})
+		if err != nil {
+			panic(err)
+		}
+		db.Where("version=?", dbVersion.Version).Updates(&model.DbVersion{
+			Version: 5,
+		})
+		dbVersion.Version = 5
+	}
+	if dbVersion.Version < 6 {
+		err := db.AutoMigrate(&model.Arena{})
+		if err != nil {
+			panic(err)
+		}
+		db.Where("version=?", dbVersion.Version).Updates(&model.DbVersion{
+			Version: 6,
+		})
+		dbVersion.Version = 6
+	}
+	if dbVersion.Version < 7 {
+		err := db.AutoMigrate(&model.RaceRewards{}, &model.RaceTypes{})
+		if err != nil {
+			panic(err)
+		}
+		db.Where("version=?", dbVersion.Version).Updates(&model.DbVersion{
+			Version: 7,
+		})
+		dbVersion.Version = 7
+	}
+	if dbVersion.Version < 8 {
+		err := db.AutoMigrate(&model.ArenaCars{})
+		if err != nil {
+			panic(err)
+		}
+		db.Where("version=?", dbVersion.Version).Updates(&model.DbVersion{
+			Version: 8,
+		})
+		dbVersion.Version = 8
+	}
+	if dbVersion.Version < 9 {
+		err := db.AutoMigrate(&model.PlayerLevel{}, &model.ArenaRaceRecord{})
+		if err != nil {
+			panic(err)
+		}
+		db.Where("version=?", dbVersion.Version).Updates(&model.DbVersion{
+			Version: 9,
+		})
+		dbVersion.Version = 9
+	}
 
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// 	db.Where("version=?", dbVersion.Version).Updates(&model.DbVersion{
-	// 		Version: 2,
-	// 	})
-	// 	dbVersion.Version = 2
+	if dbVersion.Version < 10 {
+		err := db.AutoMigrate(&model.Session{})
+		if err != nil {
+			panic(err)
+		}
+		db.Where("version=?", dbVersion.Version).Updates(&model.DbVersion{
+			Version: 10,
+		})
+		dbVersion.Version = 10
+	}
 
-	// }
-	// if dbVersion.Version < 3 {
-	// 	err := db.AutoMigrate(&model.Credential{})
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// 	db.Where("version=?", dbVersion.Version).Updates(&model.DbVersion{
-	// 		Version: 3,
-	// 	})
-	// 	dbVersion.Version = 3
-	// }
+	if dbVersion.Version < 11 {
+		err := db.AutoMigrate(&model.TempRaceRecords{})
+		if err != nil {
+			panic(err)
+		}
+		db.Where("version=?", dbVersion.Version).Updates(&model.DbVersion{
+			Version: 11,
+		})
+		dbVersion.Version = 11
+	}
+	if dbVersion.Version < 12 {
+		err := db.AutoMigrate(&model.ArenaLevelPerks{}, &model.Notifications{})
+		if err != nil {
+			panic(err)
+		}
+		db.Where("version=?", dbVersion.Version).Updates(&model.DbVersion{
+			Version: 12,
+		})
+		dbVersion.Version = 12
+	}
+	if dbVersion.Version < 13 {
+		err := db.AutoMigrate(&model.Shop{})
+		if err != nil {
+			panic(err)
+		}
+		db.Where("version=?", dbVersion.Version).Updates(&model.DbVersion{
+			Version: 13,
+		})
+		dbVersion.Version = 13
+	}
 
 }

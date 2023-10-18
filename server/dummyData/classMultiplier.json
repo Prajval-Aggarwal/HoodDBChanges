@@ -1,0 +1,22 @@
+[
+    {
+        "class": "S",
+        "orMultiplier": 1.2
+    },
+    {
+        "class": "A",
+        "orMultiplier": 1.3
+    },
+    {
+        "class": "B",
+        "orMultiplier": 1.5
+    },
+    {
+        "class": "C",
+        "orMultiplier": 1.7
+    },
+    {
+        "class": "D",
+        "orMultiplier": 2.0
+    }
+]

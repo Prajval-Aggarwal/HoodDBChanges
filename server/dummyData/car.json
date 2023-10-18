@@ -1,0 +1,183 @@
+
+[
+  {
+    "carId": "Hood_car_01",
+    "carName": "Hustle Racer",
+    "class": 1,
+    "currType": "cash",
+    "cost": 750,
+    "premiumBuy":0,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_02",
+    "carName": "Ghetto Thunder",
+    "class": 1,
+    "currType": "coins",
+    "cost": 2250,
+    "premiumBuy":500,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_03",
+    "carName": "Street Reaper",
+    "class": 1,
+    "currType": "coins",
+    "cost": 2500,
+    "premiumBuy":500,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_04",
+    "carName": "Block Burner",
+    "class": 1,
+    "currType": "coins",
+    "cost": 2750,
+    "premiumBuy":750,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_05",
+    "carName": "Slam Titan",
+    "class": 1,
+    "currType": "coins",
+    "cost": 1750,
+    "premiumBuy":500,
+    "locked": false
+  },
+  {
+    "carId": "Hood_car_06",
+    "carName": "Asphalt Avenger",
+    "class": 1,
+    "currType": "cash",
+    "cost": 500,
+    "premiumBuy":0,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_07",
+    "carName": "Hooded Havoc",
+    "class": 1,
+    "currType": "coins",
+    "cost": 2000,
+    "premiumBuy":500,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_08",
+    "carName": "Urban Mayhem",
+    "class": 2,
+    "currType": "coins",
+    "cost": 7250,
+    "premiumBuy":1750,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_09",
+    "carName": "Turbo Outlaw",
+    "class": 2,
+    "currType": "cash",
+    "cost": 2250,
+    "premiumBuy":0,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_010",
+    "carName": "Nitro Renegade",
+    "class": 2,
+    "currType": "coins",
+    "cost": 9250,
+    "premiumBuy":2000,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_011",
+    "carName": "Savage Speedster",
+    "class": 2,
+    "currType": "coins",
+    "cost": 7750,
+    "premiumBuy":1750,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_012",
+    "carName": "Riot Rider",
+    "class": 2,
+    "currType": "cash",
+    "cost": 1750,
+    "premiumBuy":0,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_013",
+    "carName": "Vibe Vixen",
+    "class": 3,
+    "currType": "cash",
+    "cost": 4750,
+    "premiumBuy":0,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_014",
+    "carName": "Underground Fury",
+    "class": 3,
+    "currType": "coins",
+    "cost": 26750,
+    "premiumBuy":4000,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_015",
+    "carName": "Rebel Roadster",
+    "class":3,
+    "currType": "coins",
+    "cost": 24750,
+    "premiumBuy":3750,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_016",
+    "carName": "Rampage Runner",
+    "class": 4,
+    "currType": "coins",
+    "cost": 54000,
+    "premiumBuy":6750,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_017",
+    "carName": "Infamous Inferno",
+    "class": 4,
+    "currType": "cash",
+    "cost": 7000,
+    "premiumBuy":0,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_018",
+    "carName": "Grime Gladiator",
+    "class": 4,
+    "currType": "coins",
+    "cost": 51000,
+    "premiumBuy":6250,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_019",
+    "carName": "Hoodrat Rocket",
+    "class": 5,
+    "currType": "coins",
+    "cost": 96750,
+    "premiumBuy":10750,
+    "locked": true
+  },
+  {
+    "carId": "Hood_car_020",
+    "carName": "Swagger Sprinter",
+    "class": 5,
+    "currType": "cash",
+    "cost": 12250,
+    "premiumBuy":0,
+    "locked": true
+  }
+]

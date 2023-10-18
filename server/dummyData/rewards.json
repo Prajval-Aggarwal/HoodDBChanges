@@ -1,0 +1,242 @@
+[
+  {
+    "id": "1",
+    "coins": 500,
+    "cash": 0,
+    "repairParts": 100,
+    "status": "win",
+    "xpGained": 45
+  },
+  {
+    "id": "2",
+    "coins": 750,
+    "cash": 0,
+    "repairParts": 125,
+    "status": "win",
+    "xpGained": 75
+  },
+  {
+    "id": "3",
+    "coins": 1000,
+    "cash": 0,
+    "repairParts": 175,
+    "status": "win",
+    "xpGained": 100
+  },
+  {
+    "id": "4",
+    "coins": 250,
+    "cash": 0,
+    "repairParts": 50,
+    "status": "win",
+    "xpGained": 25
+  },
+  {
+    "id": "5",
+    "coins": 500,
+    "cash": 0,
+    "repairParts": 75,
+    "status": "win",
+    "xpGained": 50
+  },
+  {
+    "id": "6",
+    "coins": 750,
+    "cash": 0,
+    "repairParts": 150,
+    "status": "win",
+    "xpGained": 75
+  },
+  {
+    "id": "7",
+    "coins": 275,
+    "cash": 0,
+    "repairParts": 25,
+    "status": "win",
+    "xpGained": 25
+  },
+  {
+    "id": "8",
+    "coins": 750,
+    "cash": 0,
+    "repairParts": 50,
+    "status": "win",
+    "xpGained": 50
+  },
+  {
+    "id": "9",
+    "coins": 1000,
+    "cash": 0,
+    "repairParts": 100,
+    "status": "win",
+    "xpGained": 75
+  },
+  {
+    "id": "10",
+    "coins": 250,
+    "cash": 0,
+    "repairParts": 50,
+    "status": "win",
+    "xpGained": 25
+  },
+  {
+    "id": "11",
+    "coins": 500,
+    "cash": 0,
+    "repairParts": 100,
+    "status": "win",
+    "xpGained": 50
+  },
+  {
+    "id": "12",
+    "coins": 750,
+    "cash": 0,
+    "repairParts": 150,
+    "status": "win",
+    "xpGained": 75
+  },
+  {
+    "id": "1",
+    "coins": 250,
+    "cash": 0,
+    "repairParts": 45,
+    "status": "lost",
+    "xpGained": 15
+  },
+  {
+    "id": "2",
+    "coins": 500,
+    "cash": 0,
+    "repairParts": 60,
+    "status": "lost",
+    "xpGained": 25
+  },
+  {
+    "id": "3",
+    "coins": 500,
+    "cash": 0,
+    "repairParts": 90,
+    "status": "lost",
+    "xpGained": 35
+  },
+  {
+    "id": "4",
+    "coins": 250,
+    "cash": 0,
+    "repairParts": 30,
+    "status": "lost",
+    "xpGained": 10
+  },
+  {
+    "id": "5",
+    "coins": 250,
+    "cash": 0,
+    "repairParts": 45,
+    "status": "lost",
+    "xpGained": 15
+  },
+  {
+    "id": "6",
+    "coins": 500,
+    "cash": 0,
+    "repairParts": 75,
+    "status": "lost",
+    "xpGained": 25
+  },
+  {
+    "id": "7",
+    "coins": 100,
+    "cash": 0,
+    "repairParts": 15,
+    "status": "lost",
+    "xpGained": 10
+  },
+  {
+    "id": " 8",
+    "coins": 250,
+    "cash": 0,
+    "repairParts": 30,
+    "status": "lost",
+    "xpGained": 15
+  },
+  {
+    "id": "9",
+    "coins": 350,
+    "cash": 0,
+    "repairParts": 45,
+    "status": "lost",
+    "xpGained": 25
+  },
+  {
+    "id": "10",
+    "coins": 100,
+    "cash": 0,
+    "repairParts": 30,
+    "status": "lost",
+    "xpGained": 10
+  },
+  {
+    "id": "11",
+    "coins":150,
+    "cash": 0,
+    "repairParts": 45,
+    "status": "lost",
+    "xpGained": 15
+  },
+  {
+    "id": "12",
+    "coins": 250,
+    "cash": 0,
+    "repairParts": 75,
+    "status": "lost",
+    "xpGained": 25
+  },
+  {
+    "id": "13",
+    "coins": 750,
+    "cash": 0,
+    "repairParts": 150,
+    "status": "win",
+    "xpGained": 0
+  },
+  {
+    "id": "14",
+    "coins": 1500,
+    "cash": 0,
+    "repairParts": 500,
+    "status": "win",
+    "xpGained": 0
+  },
+  {
+    "id": "15",
+    "coins": 2250,
+    "cash": 0,
+    "repairParts": 1050,
+    "status": "win",
+    "xpGained": 0
+  },
+  {
+    "id": "13",
+    "coins": 250,
+    "cash": 0,
+    "repairParts": 75,
+    "status": "lost",
+    "xpGained": 0
+  },
+  {
+    "id": "14",
+    "coins": 500,
+    "cash": 0,
+    "repairParts": 255,
+    "status": "lost",
+    "xpGained": 0
+  },
+  {
+    "id": "15",
+    "coins": 750,
+    "cash": 0,
+    "repairParts": 525,
+    "status": "lost",
+    "xpGained": 0
+  }
+]

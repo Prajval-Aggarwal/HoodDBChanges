@@ -6,3 +6,8 @@ type Session struct {
 	UserId    string `json:"userId"`
 	Token     string `json:"token"`
 }
+
+type ResetSession struct {
+	Id    string `json:"id"`
+	Token string `json:"token"`
+}

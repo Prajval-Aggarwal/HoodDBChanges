@@ -1,0 +1,802 @@
+[
+    {
+        "carId": "Hood_car_01",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_01",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_01",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_01",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_01"
+    },
+    {
+        "carId": "Hood_car_02",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_02",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_02",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_02",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_02"
+    },
+    {
+        "carId": "Hood_car_03",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_03",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_03",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_03",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_03"
+    },
+    {
+        "carId": "Hood_car_04",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_04",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_04",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_04",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_04"
+    },
+    {
+        "carId": "Hood_car_05",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_05",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_05",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_05",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_05"
+    },
+    {
+        "carId": "Hood_car_06",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_06",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_06",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_06",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_06"
+    },
+    {
+        "carId": "Hood_car_07",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_07",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_07",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_07",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_07"
+    },
+    {
+        "carId": "Hood_car_08",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_08",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_08",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_08",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_08"
+    },
+    {
+        "carId": "Hood_car_09",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_09",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_09",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_09",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_09"
+    },
+    {
+        "carId": "Hood_car_010",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_010",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_010",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_010",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_010"
+    },
+    {
+        "carId": "Hood_car_011",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_011",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_011",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_011",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_011"
+    },
+    {
+        "carId": "Hood_car_012",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_012",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_012",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_012",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_012"
+    },
+    {
+        "carId": "Hood_car_013",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_013",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_013",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_013",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_013"
+    },
+    {
+        "carId": "Hood_car_014",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_014",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_014",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_014",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_014"
+    },
+    {
+        "carId": "Hood_car_015",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_015",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_015",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_015",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_015"
+    },
+    {
+        "carId": "Hood_car_016",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_016",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_016",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_016",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_016"
+    },
+    {
+        "carId": "Hood_car_017",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_017",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_017",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_017",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_017"
+    },
+    {
+        "carId": "Hood_car_018",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_018",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_018",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_018",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_018"
+    },
+    {
+        "carId": "Hood_car_019",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_019",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_019",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_019",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_019"
+    },
+    {
+        "carId": "Hood_car_020",
+        "part": "color",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_020",
+        "part": "wheels",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_020",
+        "part": "interior",
+        "colorCategory": "default",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": ""
+    },
+    {
+        "carId": "Hood_car_020",
+        "part": "license",
+        "colorCategory": "",
+        "colorType": "",
+        "colorCode": "",
+        "colorName": "",
+        "currType": "",
+        "value": "hood_car_020"
+    }
+]

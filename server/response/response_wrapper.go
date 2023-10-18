@@ -2,6 +2,7 @@ package response
 
 import (
 	"github.com/gin-gonic/gin"
+	socketio "github.com/googollee/go-socket.io"
 )
 
 type Success struct {
@@ -26,4 +27,21 @@ func ShowResponse(message string, statusCode int64, status string, data interfac
 	}
 
 	Response(context, int(statusCode), response)
+}
+
+type SocketResp struct {
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
+}
+
+func SocketResponse(message string, statusCode int64, status string, data interface{}, eventName string, s socketio.Conn) {
+	socketResponse := Success{
+		Status:  status,
+		Code:    statusCode,
+		Message: message,
+		Data:    data,
+	}
+
+	s.Emit(eventName, socketResponse)
+
 }

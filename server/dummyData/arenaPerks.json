@@ -1,0 +1,21 @@
+[
+    {
+        "arenaLevel": 1,
+        "coins": 25,
+        "cash": 0,
+        "repairParts": 0
+    },
+    {
+        "arenaLevel": 2,
+        "coins": 175,
+        "cash": 0,
+        "repairParts": 25
+    },
+    {
+        "arenaLevel": 3,
+        "coins": 450,
+        "cash": 0,
+        "repairParts": 50
+    }
+
+]

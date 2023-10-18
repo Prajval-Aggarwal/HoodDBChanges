@@ -1,5 +1,10 @@
 package utils
 
+import socketio "github.com/googollee/go-socket.io"
+
+var SocketServerInstance = socketio.NewServer(nil)
+
+// Status codes
 const (
 	HTTP_BAD_REQUEST                     int64 = 400
 	HTTP_UNAUTHORIZED                    int64 = 401
@@ -51,11 +56,114 @@ const (
 	INVALID_TOKEN string = "Token Absent or Invalid token"
 	UNAUTHORIZED  string = "Unauthorized"
 )
+const (
+	Authorization string = "Authorization"
+)
 
 const (
-	LOGIN_SUCCESS      string = "Login Success"
+	UPGRADE_POWER      int64   = 6
+	UPGRADE_SHIFT_TIME float64 = 0.1
+	UPGRADE_GRIP       float64 = 1.0
+)
+const (
+	PLAYERID  string = "playerId"
+	PLAYER_ID string = "player_id"
+)
+
+type ARENA_LEVEL int64
+
+const (
+	EASY   ARENA_LEVEL = iota + 1 // EnumIndex = 1
+	MEDIUM                        // EnumIndex = 2
+	HARD                          // EnumIndex = 3
+)
+
+// Arena constants
+
+const (
+	AdminLogin = iota + 1
+	PlayerLogin
+	GuestLogin
+)
+
+const (
+	D = iota + 1
+	C
+	B
+	A
+	S
+)
+
+const (
+	ADD_EMAIL_REWARD int64 = 500
+)
+
+const (
+	READ = iota + 1
+	UNREAD
+)
+
+const (
+	COINS = iota + 1
+	CASH
+	REPAIR_PARTS
+	REAL_MONEY
+)
+
+// car cutomisation mapping
+type COLOR int64
+
+const (
+	CRED COLOR = iota + 1
+	CGREEN
+	CPINK
+	CYELLOW
+	CBLUE
+)
+
+type COLOR_TYPE int
+
+const (
+	FLUORESCENT COLOR_TYPE = iota + 1
+	PASTEL
+	GUN_METAL
+	SATIN
+	METAL
+	MILITARY
+)
+
+type MILITARY_COLOR int
+
+const (
+	MCBLACK MILITARY_COLOR = iota + 1
+	MCDESERT
+	MCTRAM
+	MCUCP
+)
+
+type CALLIPER_COLOR int
+
+const (
+	CCBLACK CALLIPER_COLOR = iota + 1
+	CCBLUE
+	CCGREEN
+	CCPINK
+	CCRED
+	CCYELLOW
+)
+
+type INTERIOR_TYPE int
+
+const (
+	ITWHITE INTERIOR_TYPE = iota + 1
+	ITPINK
+	ITGREEN
+	ITRED
+	ITBLUE
+	ITYELLOW
+)
+
+const (
 	SIGNUP_SUCCESS     string = "Signup Success"
-	EMAIL_EXISTS       string = "Email already exists"
-	USER_NOT_FOUND     string = "User not found"
 	PASSWORD_NOT_MATCH string = "Password are not same"
 )
