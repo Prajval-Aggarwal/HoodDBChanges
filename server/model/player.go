@@ -57,7 +57,7 @@ type PlayerRaceStats struct {
 	Id               string  `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
 	PlayerId         string  `json:"playerId,omitempty"`
 	Player           Player  `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
-	ArenaId          string  `json:"arenaId,omitempty"`
+	ArenaId          *string `json:"arenaId,omitempty"`
 	Arena            Arena   `json:"-" gorm:"references:ArenaId;constraint:OnDelete:CASCADE"`
 	WinStreak        int64   `json:"winStreak"`
 	LoseStreak       int64   `json:"loseStreak"`

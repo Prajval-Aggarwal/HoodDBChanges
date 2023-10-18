@@ -77,7 +77,7 @@ func AddArenaService(ctx *gin.Context, addArenaReq request.AddArenaRequest) {
 
 	aiOwnedArena := model.PlayerRaceStats{
 		PlayerId:         AIId,
-		ArenaId:          newArena.ArenaId,
+		ArenaId:          &newArena.ArenaId,
 		LoseStreak:       0,
 		DistanceTraveled: 0,
 		ShdWon:           0,

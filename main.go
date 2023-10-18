@@ -10,6 +10,7 @@ import (
 	"main/server/handler"
 	admin "main/server/handler/admin"
 	player "main/server/handler/player"
+	"main/server/services/auth"
 
 	"main/server/socket"
 	"os"
@@ -35,7 +36,7 @@ func main() {
 	go admin.AdminSignUpHandler()
 	go handler.AddDummyDataHandler()
 
-	// go auth.AddAiToDB()
+	go auth.AddAiToDB()
 
 	go player.AddPlayerLevel()
 

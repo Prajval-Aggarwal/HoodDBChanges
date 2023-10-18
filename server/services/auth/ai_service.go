@@ -25,7 +25,6 @@ func AddAiToDB() {
 	//create record in player table as user type of ai
 
 	// Generate a new player UUID and access token expiration time (48 hours from now).
-	//	playerUUID := uuid.New().String()
 
 	// Create a new player record with default values.
 
@@ -40,7 +39,6 @@ func AddAiToDB() {
 
 		for i := 0; i < len(slice); i++ {
 			playerUUID := uuid.New().String()
-
 			playerRecord := model.Player{
 				PlayerId:       playerUUID,
 				PlayerName:     slice[i],
@@ -61,6 +59,9 @@ func AddAiToDB() {
 			}
 			playerRaceHist := model.PlayerRaceStats{
 				PlayerId:         playerUUID,
+				ArenaId:          nil,
+				WinStreak:        0,
+				LoseStreak:       0,
 				DistanceTraveled: 0,
 				ShdWon:           0,
 				TotalShdPlayed:   0,
