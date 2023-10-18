@@ -147,11 +147,6 @@ func GetArenaListHandler(ctx *gin.Context) {
 	arena.GetAllArenaService(ctx)
 }
 
-// just for backend not for front end so no swagger
-func AddArenaTypesHandler() {
-	arena.AddGargeTypes()
-}
-
 // GetArenaTypeHandler retrieves the list of all garages.
 //
 // @Summary Get All Arena type List

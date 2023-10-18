@@ -147,15 +147,6 @@ func GetAllGarageListHandler(ctx *gin.Context) {
 	garage.GetAllGarageListService(ctx)
 }
 
-// just for backend not for front end so no swagger
-func AddGarageTypesHandler() {
-	garage.AddGargeTypes()
-}
-
-func AddRarityHandler() {
-	garage.AddRarity()
-}
-
 // GetGarageTypesHandler retrieves the list of all garages.
 //
 // @Summary Get All Garage type List

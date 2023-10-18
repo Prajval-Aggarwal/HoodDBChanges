@@ -1,8 +1,795 @@
 basePath: /
+definitions:
+  request.AddArenaRequest:
+    properties:
+      arenaLevel:
+        type: integer
+      arenaName:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+    type: object
+  request.AddGarageRequest:
+    properties:
+      coinsRequired:
+        description: coins required to unlock the garage
+        type: integer
+      garageName:
+        type: string
+      garageType:
+        type: integer
+      latitude:
+        type: number
+      level:
+        description: level required to unlock the garage
+        type: integer
+      longitude:
+        type: number
+      rarity:
+        type: integer
+    type: object
+  request.AdminLoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  request.DeletArenaReq:
+    properties:
+      arenaId:
+        type: string
+    type: object
+  request.DeletGarageReq:
+    properties:
+      garageId:
+        type: string
+    type: object
+  request.ForgotPassRequest:
+    properties:
+      email:
+        type: string
+    type: object
+  request.GuestLoginRequest:
+    properties:
+      deviceId:
+        type: string
+      os:
+        type: integer
+      playerName:
+        type: string
+      token:
+        type: string
+    type: object
+  request.PlayerLoginRequest:
+    properties:
+      credential:
+        type: string
+    type: object
+  request.UpdateArenaReq:
+    properties:
+      arenaId:
+        type: string
+      arenaLevel:
+        type: integer
+      arenaName:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+    type: object
+  request.UpdateEmailRequest:
+    properties:
+      email:
+        type: string
+    type: object
+  request.UpdateGarageReq:
+    properties:
+      coinsRequired:
+        description: coins required to unlock the garage
+        type: integer
+      garageId:
+        type: string
+      garageName:
+        type: string
+      garageType:
+        type: integer
+      latitude:
+        type: number
+      level:
+        description: level required to unlock the garage
+        type: integer
+      longitude:
+        type: number
+      rarity:
+        type: integer
+    type: object
+  request.UpdatePasswordRequest:
+    properties:
+      oldPassword:
+        type: string
+      password:
+        type: string
+    type: object
+  response.Success:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+      status:
+        type: string
+    type: object
 info:
   contact: {}
   description: This is a demo version of Gin app.
   title: Gin Demo App
   version: "1.0"
-paths: {}
+paths:
+  /admin:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the list of all admins
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Admin Details fetched successfully
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Get Admins list
+      tags:
+      - Authentication
+  /admin/arena:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a Arena by its ID
+      parameters:
+      - description: Admin Access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Arena request payload
+        in: body
+        name: ArenaReq
+        required: true
+        schema:
+          $ref: '#/definitions/request.DeletArenaReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Arena deleted successful
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "404":
+          description: Arena not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Delete a Arena
+      tags:
+      - Arena
+    post:
+      consumes:
+      - application/json
+      description: Add a new arena to the system
+      parameters:
+      - description: Admin Access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Arena request payload
+        in: body
+        name: garageReq
+        required: true
+        schema:
+          $ref: '#/definitions/request.AddArenaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Arena added successful
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Add a new arena
+      tags:
+      - Arena
+    put:
+      consumes:
+      - application/json
+      description: Update a Arena by its ID
+      parameters:
+      - description: Admin Access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Update request payload
+        in: body
+        name: updateReq
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateArenaReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Arena updated successful
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "404":
+          description: Arena not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Update a Arena
+      tags:
+      - Arena
+  /admin/garage/add:
+    post:
+      consumes:
+      - application/json
+      description: Add a new garage to the system
+      parameters:
+      - description: Admin Access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Garage request payload
+        in: body
+        name: garageReq
+        required: true
+        schema:
+          $ref: '#/definitions/request.AddGarageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Garage added successful
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Add a new garage
+      tags:
+      - Garage
+  /admin/garage/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a garage by its ID
+      parameters:
+      - description: Admin Access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Garage request payload
+        in: body
+        name: garageReq
+        required: true
+        schema:
+          $ref: '#/definitions/request.DeletGarageReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Garage deleted successful
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "404":
+          description: Garage not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Delete a garage
+      tags:
+      - Garage
+  /admin/garage/update:
+    put:
+      consumes:
+      - application/json
+      description: Update a garage by its ID
+      parameters:
+      - description: Admin Access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Update request payload
+        in: body
+        name: updateReq
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateGarageReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Garage updated successful
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "404":
+          description: Garage not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Update a garage
+      tags:
+      - Garage
+  /arena/get:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the list of all Arenas
+      parameters:
+      - description: Number of records to skip (default is 0)
+        in: query
+        name: skip
+        type: integer
+      - description: Maximum number of records to fetch (default is 10)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Arena list fetched successfully
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Get All Arena List
+      tags:
+      - Arena
+  /arena/types:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the list of all arena types
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Arena type list fetched successfully
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Get All Arena type List
+      tags:
+      - Arena
+  /delete-account:
+    delete:
+      consumes:
+      - application/json
+      description: Delets the account of the player
+      parameters:
+      - description: Player Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Delete Player's account
+      tags:
+      - Authentication
+  /forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: Generates and send an email with reset password lin
+      parameters:
+      - description: Admin registered email
+        in: body
+        name: adminEmail
+        required: true
+        schema:
+          $ref: '#/definitions/request.ForgotPassRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Generates link
+      tags:
+      - Authentication
+  /garage/rarity:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the list of rarities
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List fetched successfully
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Get All Rarity list
+      tags:
+      - Garage
+  /garage/types:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the list of all garages
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Garage type list fetched successfully
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Get All Garage type List
+      tags:
+      - Garage
+  /garages/get-all:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the list of all garages
+      parameters:
+      - description: Number of records to skip (default is 0)
+        in: query
+        name: skip
+        type: integer
+      - description: Maximum number of records to fetch (default is 10)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Garage list fetched successfully
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Get All Garage List
+      tags:
+      - Garage
+  /get-shop:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of Shop items
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Get things in shop
+      tags:
+      - Shop
+  /guest-login:
+    post:
+      consumes:
+      - application/json
+      description: Perform guest login and generate access token
+      parameters:
+      - description: Guest Login Request
+        in: body
+        name: guestLoginRequest
+        required: true
+        schema:
+          $ref: '#/definitions/request.GuestLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Guest Login
+      tags:
+      - Authentication
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Perform admin login and generate access token
+      parameters:
+      - description: Login Details
+        in: body
+        name: loginDetails
+        required: true
+        schema:
+          $ref: '#/definitions/request.AdminLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Admin Login
+      tags:
+      - Authentication
+  /logout:
+    delete:
+      consumes:
+      - application/json
+      description: Logs out a player
+      parameters:
+      - description: Player Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Logout Player
+      tags:
+      - Authentication
+  /player-login:
+    post:
+      consumes:
+      - application/json
+      description: Perform user login and generate access token
+      parameters:
+      - description: Login Details
+        in: body
+        name: loginDetails
+        required: true
+        schema:
+          $ref: '#/definitions/request.PlayerLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Player Login
+      tags:
+      - Authentication
+  /reset-password:
+    patch:
+      consumes:
+      - application/json
+      description: Reset password
+      parameters:
+      - description: Reset token
+        in: query
+        name: token
+        required: true
+        type: string
+      - description: Admins new password
+        in: body
+        name: NewPassword
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdatePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Reset's the password
+      tags:
+      - Authentication
+  /update-email:
+    put:
+      consumes:
+      - application/json
+      description: Update the email address of a player
+      parameters:
+      - description: Update Email Request
+        in: body
+        name: email
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateEmailRequest'
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Email updated successfully
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Success'
+        "404":
+          description: Player not found
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Update Email
+      tags:
+      - Player
+  /update-pass:
+    patch:
+      consumes:
+      - application/json
+      description: Updates the password of the admin
+      parameters:
+      - description: Admin Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: New password of the player
+        in: body
+        name: newPassword
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdatePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Updates the password of the admin
+      tags:
+      - Authentication
 swagger: "2.0"

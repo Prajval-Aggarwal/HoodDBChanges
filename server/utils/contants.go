@@ -87,6 +87,12 @@ const (
 )
 
 const (
+	EASY_ARENA_SERIES   int64 = 3
+	MEDIUM_ARENA_SERIES int64 = 5
+	HARD_ARENA_SERIES   int64 = 7
+)
+
+const (
 	D = iota + 1
 	C
 	B
@@ -166,4 +172,14 @@ const (
 const (
 	SIGNUP_SUCCESS     string = "Signup Success"
 	PASSWORD_NOT_MATCH string = "Password are not same"
+)
+
+type GARAGE_TYPE int
+
+const (
+	THE_MU GARAGE_TYPE = iota + 1
+	REDS_HOTSPOT
+	THE_BEARS_HIDEAWAY
+	PRINCES_PALACE
+	THE_GREAT_SPOT
 )

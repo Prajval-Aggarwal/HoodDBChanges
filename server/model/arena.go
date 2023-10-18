@@ -34,13 +34,12 @@ type ArenaLevelPerks struct {
 }
 
 type ArenaCars struct {
-	Id                     string                 `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
-	PlayerId               string                 `json:"playerId" `
-	Player                 Player                 `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
-	ArenaId                string                 `json:"arenaId"`
-	Arena                  Arena                  `json:"-" gorm:"references:ArenaId;constraint:OnDelete:CASCADE"`
-	CustId                 string                 `json:"custId"`
-	PlayerCarCustomisation PlayerCarCustomisation `json:"-" gorm:"references:CustId;constraint:OnDelete:CASCADE"`
+	Id       string `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
+	PlayerId string `json:"playerId" `
+	Player   Player `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
+	ArenaId  string `json:"arenaId"`
+	Arena    Arena  `json:"-" gorm:"references:ArenaId;constraint:OnDelete:CASCADE"`
+	CustId   string `json:"custId"`
 }
 type Arena struct {
 	ArenaId    string    `json:"arenaId" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`

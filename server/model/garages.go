@@ -17,11 +17,11 @@ type Garage struct {
 }
 
 type GarageCars struct {
-	Id                     string                 `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
-	PlayerId               string                 `json:"playerId"`
-	Player                 Player                 `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
-	GarageId               string                 `json:"garageId"`
-	Garage                 Garage                 `json:"-" gorm:"references:GarageId;constraint:OnDelete:CASCADE"`
-	CustId                 string                 `json:"custId"`
-	PlayerCarCustomisation PlayerCarCustomisation `json:"-" gorm:"references:CustId;constraint:OnDelete:CASCADE"`
+	Id       string `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
+	PlayerId string `json:"playerId"`
+	Player   Player `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
+	GarageId string `json:"garageId"`
+	Garage   Garage `json:"-" gorm:"references:GarageId;constraint:OnDelete:CASCADE"`
+	CustId   string `json:"custId"`
+	//PlayerCarCustomisation   PlayerCarCustomisation `json:"-" gorm:"references:PlayerCarCustomisationId;constraint:OnDelete:CASCADE"`
 }

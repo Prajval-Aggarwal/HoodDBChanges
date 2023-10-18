@@ -3,11 +3,16 @@ package main
 import (
 	"log"
 	"main/server"
-	"main/server/db"
-	"main/server/socket"
-	"os"
 
 	"github.com/joho/godotenv"
+
+	"main/server/db"
+	"main/server/handler"
+	admin "main/server/handler/admin"
+	player "main/server/handler/player"
+
+	"main/server/socket"
+	"os"
 )
 
 // @title Gin Demo App
@@ -26,14 +31,11 @@ func main() {
 	app := server.NewServer(connection)
 	server.ConfigureRoutes(app)
 
-	//by default insertion
+	// //by default insertion
 	go admin.AdminSignUpHandler()
-	go admin.AddGarageTypesHandler()
-	go admin.AddArenaTypesHandler()
 	go handler.AddDummyDataHandler()
 
-	go admin.AddRarityHandler()
-	go auth.AddAiToDB()
+	// go auth.AddAiToDB()
 
 	go player.AddPlayerLevel()
 

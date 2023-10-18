@@ -25,12 +25,12 @@ func AddDummyDataHandler() {
 		dataPtr   interface{}
 	}{
 		{"cars", "server/dummyData/car.json", &[]model.Car{}},
-		{"car_customizations", "server/dummyData/customization.json", &[]model.PartCustomization{}},
+		{"part_customizations", "server/dummyData/partCustomization.json", &[]model.PartCustomization{}},
 		{"default_customizations", "server/dummyData/defaultCustomization.json", &[]model.DefualtCustomisation{}},
-		{"rewards", "server/dummyData/rewards.json", &[]model.RaceRewards{}},
 		{"race_types", "server/dummyData/raceTypes.json", &[]model.RaceTypes{}},
+		{"race_rewards", "server/dummyData/rewards.json", &[]model.RaceRewards{}},
 		{"rating_multis", "server/dummyData/classMultiplier.json", &[]model.RatingMulti{}},
-		{"arena_perks", "server/dummyData/arenaPerks.json", &[]model.ArenaLevelPerks{}},
+		{"arena_level_perks", "server/dummyData/arenaPerks.json", &[]model.ArenaLevelPerks{}},
 	}
 
 	for _, dataFile := range dataFiles {
@@ -56,6 +56,12 @@ func addtoDb(filePath string, modelType interface{}) {
 	case *[]model.Car:
 		for _, item := range *slice {
 			fmt.Println("Car data:", item)
+			db.CreateRecord(&item)
+		}
+	case *[]model.PartCustomization:
+		// Handle other struct types similarly
+		for _, item := range *slice {
+			fmt.Println("part customization data:", item)
 			db.CreateRecord(&item)
 		}
 	case *[]model.DefualtCustomisation:
