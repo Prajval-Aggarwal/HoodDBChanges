@@ -1,6 +1,10 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Player struct {
 	PlayerId       string `json:"playerId,omitempty" gorm:"unique;primaryKey"`
@@ -13,25 +17,34 @@ type Player struct {
 	Cash           int64  `json:"cash,omitempty"`
 	RepairCurrency int64  `json:"repairParts,omitempty"`
 	// DeviceId    string `json:"deviceId,omitempty"`
-	OS int64 `json:"os,omitempty"` // o for android 1 for ios
+	OS        int64 `json:"os,omitempty"` // o for android 1 for ios
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 }
 
 type OwnedCars struct {
-	gorm.Model
-	PlayerId string `json:"player_Id"`
-	Player   Player `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
-	Selected bool   `json:"selected"`
-	CustId   string `json:"custId" `
+	Id        string `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
+	PlayerId  string `json:"player_Id"`
+	Player    Player `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
+	Selected  bool   `json:"selected"`
+	CustId    string `json:"custId" `
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 	// PlayerCarCustomisation PlayerCarCustomisation `json:"-" gorm:"references:CustId;foreignKey:CustId;constraint:OnDelete:CASCADE"`
 }
 
 type OwnedGarage struct {
-	gorm.Model
-	PlayerId string `json:"playerId,omitempty"`
-	Player   Player `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
-	GarageId string `json:"garageId,omitempty"`
-	Garage   Garage `json:"-" gorm:"references:GarageId;constraint:OnDelete:CASCADE"`
-	CarLimit int64  `json:"carLimit,omitempty"`
+	Id        string `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
+	PlayerId  string `json:"playerId,omitempty"`
+	Player    Player `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
+	GarageId  string `json:"garageId,omitempty"`
+	Garage    Garage `json:"-" gorm:"references:GarageId;constraint:OnDelete:CASCADE"`
+	CarLimit  int64  `json:"carLimit,omitempty"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 }
 
 type PlayerCarCustomisation struct {
@@ -57,10 +70,13 @@ type PlayerCarCustomisation struct {
 	WheelColorName    string     `json:"wheelColorName,omitempty"`
 	InteriorColorName string     `json:"interiorColorName,omitempty"`
 	LPValue           string     `json:"lp_value,omitempty"`
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
+	DeletedAt         gorm.DeletedAt
 }
 
 type PlayerRaceStats struct {
-	gorm.Model
+	Id               string  `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
 	PlayerId         string  `json:"playerId,omitempty"`
 	Player           Player  `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
 	ArenaId          *string `json:"arenaId,omitempty"`
@@ -72,4 +88,7 @@ type PlayerRaceStats struct {
 	TotalShdPlayed   int64   `json:"totalShdPlayed"`
 	TdWon            int64   `json:"takeDownWon"`
 	TotalTdPlayed    int64   `json:"totalTdPlayed"`
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+	DeletedAt        gorm.DeletedAt
 }

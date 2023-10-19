@@ -6,4 +6,5 @@ type RatingMulti struct {
 	gorm.Model
 	Class        string  `json:"class"`
 	ORMultiplier float64 `json:"orMultiplier"`
+	
 }

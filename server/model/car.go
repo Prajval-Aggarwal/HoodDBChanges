@@ -1,5 +1,11 @@
 package model
 
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
+
 type Car struct {
 	CarId      string  `json:"carId"  gorm:"unique;primaryKey"`
 	CarName    string  `json:"carName,omitempty"`
@@ -8,6 +14,9 @@ type Car struct {
 	PremiumBuy int64   `json:"premiumBuy,omitempty"`
 	Class      int64   `json:"class,omitempty"`
 	Locked     bool    `json:"locked,omitempty"`
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	DeletedAt  gorm.DeletedAt
 }
 type DefaultCustomisation struct {
 	Id                string  `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
@@ -27,6 +36,9 @@ type DefaultCustomisation struct {
 	WheelColorName    string  `json:"wheelColorName,omitempty"`
 	InteriorColorName string  `json:"interiorColorName,omitempty"`
 	LPValue           string  `json:"lpValue,omitempty"`
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
+	DeletedAt         gorm.DeletedAt
 }
 
 type PartCustomization struct {
@@ -40,4 +52,7 @@ type PartCustomization struct {
 	LPValue           string  `json:"lpValue,omitempty"`
 	CurrType          string  `json:"currType,omitempty"`
 	CurrAmount        float64 `json:"currAmount,omitempty"`
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
+	DeletedAt         gorm.DeletedAt
 }
