@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Garage struct {
 	GarageId      string    `json:"garageId"  gorm:"unique;default:uuid_generate_v4();primaryKey"`
@@ -17,7 +21,7 @@ type Garage struct {
 }
 
 type GarageCars struct {
-	Id       string `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
+	gorm.Model
 	PlayerId string `json:"playerId"`
 	Player   Player `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
 	GarageId string `json:"garageId"`

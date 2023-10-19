@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"main/server/db"
 	"main/server/model"
+	"main/server/services/player"
 	"main/server/utils"
+
+	"github.com/gin-gonic/gin"
 )
 
 func AddPlayerLevel() {
@@ -58,4 +61,15 @@ func AddPlayerLevel() {
 
 func roundToNearestMultipleOf5(value float64) float64 {
 	return float64(int((value+2.5)/5.0) * 5)
+}
+
+// @Summary Get Level details
+// @Description Equip a car for a Level
+// @Tags Player
+// @Produce json
+// @Success 200 {object} response.Success "Data fetched successfully"
+// @Failure 400 {object} response.Success "Bad request"
+// @Router /level [get]
+func GetLevelHandler(ctx *gin.Context) {
+	player.GetLevelService(ctx)
 }

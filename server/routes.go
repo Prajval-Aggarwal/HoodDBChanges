@@ -6,15 +6,28 @@ import (
 	"main/server/handler"
 
 	admin "main/server/handler/admin"
+	player "main/server/handler/player"
 
+	"github.com/gin-gonic/gin"
+	socketio "github.com/googollee/go-socket.io"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func ConfigureRoutes(server *Server) {
+func ConfigureRoutes(server *Server, socketServer *socketio.Server) {
 
 	//Allowing CORS
 	server.engine.Use(gateway.CORSMiddleware())
+
+	//Check if the server is running
+	server.engine.GET("/", func(ctx *gin.Context) {
+		ctx.JSON(200, gin.H{
+			"message": "Sever listening",
+		})
+	})
+
+	//web socket handler
+	server.engine.GET("/socket.io/*any", gin.WrapH(socketServer))
 
 	//Auth routes
 	server.engine.POST("/guest-login", admin.GuestLoginHandler)
@@ -40,6 +53,12 @@ func ConfigureRoutes(server *Server) {
 	server.engine.PUT("/admin/arena", gateway.AdminAuthorization, admin.UpdateArenaHandler)
 	server.engine.GET("/arena/get", admin.GetArenaListHandler)
 	server.engine.GET("/arena/types", admin.GetArenaTypeHandler)
+
+	//Player
+	server.engine.GET("/level", player.GetLevelHandler)
+
+	//Car customise routes
+	server.engine.GET("/car/customise/price", player.GetCustomisationPriceHandler)
 
 	//Shop routes
 	server.engine.GET("/get-shop", handler.GetShopHandler)

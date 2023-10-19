@@ -1,380 +1,279 @@
 [
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "fluorescent",
         "colorName": "red",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "fluorescent",
         "colorName": "green",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "fluorescent",
         "colorName": "pink",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "fluorescent",
         "colorName": "yellow",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "fluorescent",
         "colorName": "blue",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "pastel",
         "colorName": "red",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "pastel",
         "colorName": "green",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "pastel",
         "colorName": "pink",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "pastel",
         "colorName": "yellow",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "pastel",
         "colorName": "blue",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "satin",
         "colorName": "red",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "satin",
         "colorName": "green",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "satin",
         "colorName": "pink",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "satin",
         "colorName": "yellow",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "satin",
         "colorName": "blue",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "metal",
         "colorName": "red",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "metal",
         "colorName": "green",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "metal",
         "colorName": "pink",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "metal",
         "colorName": "yellow",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "metal",
         "colorName": "blue",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "gun_Metal",
         "colorName": "red",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "gun_Metal",
         "colorName": "green",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "gun_Metal",
         "colorName": "pink",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "gun_Metal",
         "colorName": "yellow",
         "currType": "coins",
-        "value": "",
         "currAmount":2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "gun_Metal",
         "colorName": "blue",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "military",
         "colorName": "basic",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "military",
         "colorName": "black",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "military",
         "colorName": "desert",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "military",
         "colorName": "tram",
         "currType": "coins",
-        "value": "",
         "currAmount": 2000.0
     },
     {
-        "part": "color",
         "colorCategory": "paint",
         "colorType": "military",
         "colorName": "ucp",
         "currType": "coins",
-        "value": "",
         "currAmount":2000.0
     },
     {
-        "part": "interior",
-        "colorCategory": "",
-        "colorType": "",
-        "colorName": "white",
+        "interiorColorName": "white",
         "currType": "coins",
-        "value": "",
         "currAmount": 1000.0
     },
     {
-        "part": "interior",
-        "colorCategory": "",
-        "colorType": "",
-        "colorName": "pink",
+        "interiorColorName": "pink",
         "currType": "coins",
-        "value": "",
         "currAmount": 1000.0
     },
     {
-        "part": "interior",
-        "colorCategory": "",
-        "colorType": "",
-        "colorName": "green",
+        "interiorColorName": "green",
         "currType": "coins",
-        "value": "",
         "currAmount": 1000.0
     },
     {
-        "part": "interior",
-        "colorCategory": "",
-        "colorType": "",
-        "colorName": "red",
+
+        "interiorColorName": "red",
         "currType": "coins",
-        "value": "",
         "currAmount": 1000.0
     },
     {
-        "part": "interior",
-        "colorCategory": "",
-        "colorType": "",
-        "colorName": "blue",
+        "interiorColorName": "blue",
         "currType": "coins",
-        "value": "",
         "currAmount": 1000.0
     },
     {
-        "part": "interior",
-        "colorCategory": "",
-        "colorType": "",
-        "colorName": "yellow",
+        "interiorColorName": "yellow",
         "currType": "coins",
-        "value": "",
         "currAmount": 1000.0
     },
     {
-        "part": "wheels",
-        "colorCategory": "caliper",
-        "colorType": "",
-        "colorName": "blue",
+        "wheelCategory": "caliper",
+        "wheelColorName": "blue",
         "currType": "coins",
-        "value": "",
         "currAmount": 1000.0
     },
     {
-        "part": "wheels",
-        "colorCategory": "caliper",
-        "colorType": "",
-        "colorName": "black",
+        "wheelCategory": "caliper",
+        "wheelColorName": "black",
         "currType": "coins",
-        "value": "",
         "currAmount": 1000.0
     },
     {
-        "part": "wheels",
-        "colorCategory": "caliper",
-        "colorType": "",
-        "colorName": "green",
+        "wheelCategory": "caliper",
+        "wheelColorName": "green",
         "currType": "coins",
-        "value": "",
         "currAmount": 1000.0
     },
     {
-        "part": "wheels",
-        "colorCategory": "caliper",
-        "colorType": "",
-        "colorName": "pink",
+        "wheelCategory": "caliper",
+        "wheelColorName": "pink",
         "currType": "coins",
-        "value": "",
         "currAmount": 1000.0
     },
     {
-        "part": "wheels",
-        "colorCategory": "caliper",
-        "colorType": "",
-        "colorName": "red",
+        "wheelCategory": "caliper",
+        "wheelColorName": "red",
         "currType": "coins",
-        "value": "",
         "currAmount": 1000.0
     },
     {
-        "part": "wheels",
-        "colorCategory": "caliper",
-        "colorType": "",
-        "colorName": "yellow",
+        "wheelCategory": "caliper",
+        "wheelColorName": "yellow",
         "currType": "coins",
-        "value": "",
         "currAmount": 1000.0
     }
 ]

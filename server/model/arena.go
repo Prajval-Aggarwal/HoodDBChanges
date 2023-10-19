@@ -1,9 +1,13 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type ArenaRaceRecord struct {
-	Id        string    `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
+	gorm.Model
 	PlayerId  string    `json:"playerId"`
 	Player    Player    `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
 	ArenaId   string    `json:"arenaId"`
@@ -16,6 +20,7 @@ type ArenaRaceRecord struct {
 }
 
 type TempRaceRecords struct {
+	gorm.Model
 	PlayerId string `json:"playerId"`
 	Player   Player `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
 	ArenaId  string `json:"arenaId"`
@@ -26,15 +31,15 @@ type TempRaceRecords struct {
 	Car      Car    `json:"-" gorm:"references:CarId;constraint:OnDelete:CASCADE"`
 }
 type ArenaLevelPerks struct {
-	Id          string `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
-	ArenaLevel  int64  `json:"arenaLevel"`
-	Coins       int64  `json:"coins"`
-	Cash        int64  `json:"cash"`
-	RepairParts int64  `json:"repairParts"`
+	gorm.Model
+	ArenaLevel  int64 `json:"arenaLevel"`
+	Coins       int64 `json:"coins"`
+	Cash        int64 `json:"cash"`
+	RepairParts int64 `json:"repairParts"`
 }
 
 type ArenaCars struct {
-	Id       string `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
+	gorm.Model
 	PlayerId string `json:"playerId" `
 	Player   Player `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
 	ArenaId  string `json:"arenaId"`

@@ -11,6 +11,7 @@ import (
 	admin "main/server/handler/admin"
 	player "main/server/handler/player"
 	"main/server/services/auth"
+	"main/server/utils"
 
 	"main/server/socket"
 	"os"
@@ -28,9 +29,11 @@ func main() {
 	connection := db.InitDB()
 	db.Transfer(connection)
 	socketServer := socket.SocketInit()
+	utils.SocketServerInstance = socketServer
+	//handler.StartCron(socketServer)
 	defer socketServer.Close()
 	app := server.NewServer(connection)
-	server.ConfigureRoutes(app)
+	server.ConfigureRoutes(app, utils.SocketServerInstance)
 
 	// //by default insertion
 	go admin.AdminSignUpHandler()

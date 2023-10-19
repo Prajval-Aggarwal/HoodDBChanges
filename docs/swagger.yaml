@@ -420,6 +420,21 @@ paths:
       summary: Get All Arena type List
       tags:
       - Arena
+  /car/customise/price:
+    get:
+      consumes:
+      - application/json
+      description: Get the price of car parts customizations
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Get the price of car parts customizations
+      tags:
+      - Car-Customize
   /delete-account:
     delete:
       consumes:
@@ -594,6 +609,23 @@ paths:
       summary: Guest Login
       tags:
       - Authentication
+  /level:
+    get:
+      description: Equip a car for a Level
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data fetched successfully
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Get Level details
+      tags:
+      - Player
   /login:
     post:
       consumes:

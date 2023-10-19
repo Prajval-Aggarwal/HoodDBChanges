@@ -74,26 +74,11 @@ func GuestLoginService(ctx *gin.Context, guestLoginRequest request.GuestLoginReq
 
 		//give a car to that player
 
-		// newCarRecord := model.OwnedCars{
-		// 	PlayerId: playerUUID,
-		// 	CarId:    "Hood_car_05",
-		// 	CarLevel: 1,
-		// 	Selected: true,
-		// }
-
-		// err = utils.SetPlayerCarDefaults(playerUUID, "Hood_car_05")
-		// if err != nil {
-		// 	response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-		// 	return
-		// }
-
-		// //Also give a garage to that person
-
-		// err = db.CreateRecord(&newCarRecord)
-		// if err != nil {
-		// 	response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-		// 	return
-		// }
+		err = utils.SetCarData("Hood_car_05", playerUUID)
+		if err != nil {
+			response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, ctx, nil)
+			return
+		}
 
 		session := model.Session{
 			SessionType: utils.GuestLogin,

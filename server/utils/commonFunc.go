@@ -70,84 +70,55 @@ func HashPassword(password string) (*string, error) {
 	return &hashedPassword, nil
 }
 
-func AlreadyAtMax(val int) bool {
-	return val == 5
-
-}
-
-// func SetPlayerCarDefaults(playerId string, carId string) error {
-
-// 	//set default car upgrades
-// 	// playerCarUpgrades := model.PlayerCarUpgrades{
-// 	// 	PlayerId:     playerId,
-// 	// 	CarId:        carId,
-// 	// 	Engine:       0,
-// 	// 	Turbo:        0,
-// 	// 	Intake:       0,
-// 	// 	Nitrous:      1,
-// 	// 	Body:         0,
-// 	// 	Tires:        0,
-// 	// 	Transmission: 0,
-// 	// }
-// 	// err := db.CreateRecord(playerCarUpgrades)
-// 	// if err != nil {
-// 	// 	//	response.ShowResponse(err.Error(), HTTP_INTERNAL_SERVER_ERROR, FAILURE, nil, ctx)
-// 	// 	return err
-// 	// }
-
-// 	//set default car customizations
-// 	var carDefualtCutomizations []model.DefualtCustomisation
-// 	query := "SELECT * FROM default_customizations WHERE car_id=?"
-// 	err := db.QueryExecutor(query, &carDefualtCutomizations, carId)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	for _, customise := range carDefualtCutomizations {
-// 		playerCarCustomizations := model.PlayerCarCustomization{
-// 			PlayerId:      playerId,
-// 			CarId:         carId,
-// 			Part:          customise.Part,
-// 			ColorCategory: customise.ColorCategory,
-// 			ColorType:     customise.ColorType,
-// 			ColorName:     customise.ColorName,
-// 			Value:         customise.Value,
-// 		}
-// 		err = db.CreateRecord(playerCarCustomizations)
-// 		if err != nil {
-// 			return err
-// 		}
-// 	}
-
-// 	//set default car stats
-// 	var currentCarStat model.CarStats
-// 	err = db.FindById(&currentCarStat, carId, "car_id")
-// 	if err != nil {
-
-// 		return err
-// 	}
-// 	playerCarStats := model.PlayerCarsStats{
-// 		PlayerId:    playerId,
-// 		CarId:       carId,
-// 		Power:       currentCarStat.Power,
-// 		Grip:        currentCarStat.Grip,
-// 		ShiftTime:   currentCarStat.ShiftTime,
-// 		Weight:      currentCarStat.Weight,
-// 		OVR:         currentCarStat.OVR,
-// 		Durability:  currentCarStat.Durability,
-// 		NitrousTime: float64(currentCarStat.NitrousTime),
-// 	}
-// 	err = db.CreateRecord(&playerCarStats)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }
-
-func DeleteCarDetails(tableName string, playerId string, carId string) error {
-	query := "DELETE FROM " + tableName + " WHERE car_id =? AND player_id =?"
-	err := db.RawExecutor(query, carId, playerId)
+func SetCarData(carId string, playerId string) error {
+	tx := db.BeginTransaction()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+	var carDefaults model.DefaultCustomisation
+	query := "SELECT * FROM default_customisations WHERE car_id=? "
+	err := db.QueryExecutor(query, &carDefaults, carId)
 	if err != nil {
+
+		return err
+	}
+
+	playerCarCustomisations := model.PlayerCarCustomisation{
+		PlayerId:          playerId,
+		CarId:             carId,
+		Power:             carDefaults.Power,
+		Grip:              carDefaults.Grip,
+		ShiftTime:         carDefaults.ShiftTime,
+		Weight:            carDefaults.Weight,
+		OVR:               carDefaults.OVR,
+		Durability:        carDefaults.Durability,
+		NitrousTime:       carDefaults.NitrousTime,
+		ColorCategory:     carDefaults.ColorCategory,
+		ColorType:         carDefaults.ColorType,
+		ColorName:         carDefaults.ColorName,
+		WheelCategory:     carDefaults.WheelCategory,
+		WheelColorName:    carDefaults.WheelColorName,
+		InteriorColorName: carDefaults.InteriorColorName,
+		LPValue:           carDefaults.LPValue,
+	}
+
+	err = db.CreateRecord(&playerCarCustomisations)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	newCarRecord := model.OwnedCars{
+		PlayerId: playerId,
+		CustId:   playerCarCustomisations.CustId,
+		Selected: true,
+	}
+
+	err = db.CreateRecord(&newCarRecord)
+	if err != nil {
+		tx.Rollback()
 		return err
 	}
 	return nil
@@ -330,4 +301,14 @@ func GenerateRandomTime(n int, min, max float64) []string {
 
 	return slice
 
+}
+
+func GetPlayerDetails(playerId string) (*model.Player, error) {
+	var playerDetails model.Player
+	query := "SELECT * FROM players WHERE player_id=?"
+	err := db.QueryExecutor(query, &playerDetails, playerId)
+	if err != nil {
+		return nil, err
+	}
+	return &playerDetails, nil
 }

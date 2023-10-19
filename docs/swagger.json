@@ -447,6 +447,29 @@
                 }
             }
         },
+        "/car/customise/price": {
+            "get": {
+                "description": "Get the price of car parts customizations",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Car-Customize"
+                ],
+                "summary": "Get the price of car parts customizations",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Success"
+                        }
+                    }
+                }
+            }
+        },
         "/delete-account": {
             "delete": {
                 "description": "Delets the account of the player",
@@ -706,6 +729,32 @@
                     },
                     "500": {
                         "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Success"
+                        }
+                    }
+                }
+            }
+        },
+        "/level": {
+            "get": {
+                "description": "Equip a car for a Level",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Player"
+                ],
+                "summary": "Get Level details",
+                "responses": {
+                    "200": {
+                        "description": "Data fetched successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
                         "schema": {
                             "$ref": "#/definitions/response.Success"
                         }

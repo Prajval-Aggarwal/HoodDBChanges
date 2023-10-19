@@ -1,5 +1,7 @@
 package model
 
+import "gorm.io/gorm"
+
 type RaceTypes struct {
 	RaceId      int64       `json:"raceId" gorm:"autoIncrement;primaryKey"`
 	RaceRewards RaceRewards `json:"raceRewards" gorm:"references:RaceId;foreignKey:RaceId;constraint:OnDelete:CASCADE"`
@@ -10,8 +12,8 @@ type RaceTypes struct {
 }
 
 type RaceRewards struct {
-	Id     string `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
-	RaceId int64  `json:"raceId"`
+	gorm.Model
+	RaceId int64 `json:"raceId"`
 	//RaceTypes   RaceTypes `json:"-" gorm:"references:RaceId;constraint:OnDelete:CASCADE"`
 	Coins       int64  `json:"coins"`
 	Cash        int64  `json:"cash"`
