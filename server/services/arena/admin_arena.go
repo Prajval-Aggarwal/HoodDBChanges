@@ -15,8 +15,8 @@ import (
 )
 
 type carDetails struct {
-	CarId string
-	OVR   float64
+	CustId string
+	OVR    float64
 }
 
 func AddArenaService(ctx *gin.Context, addArenaReq request.AddArenaRequest) {
@@ -111,7 +111,7 @@ func AddArenaService(ctx *gin.Context, addArenaReq request.AddArenaRequest) {
 			PlayerId: aiOwnedArena.PlayerId,
 			ArenaId:  newArena.ArenaId,
 			TimeWin:  fmt.Sprintf("%v", val),
-			CarId:    carSlice[i].CarId,
+			CustId:   carSlice[i].CustId,
 			Result:   "win",
 		}
 
@@ -278,19 +278,62 @@ func GiveRandomCar(playerId string, arenaId string, min int64, max int64, slots 
 
 	var carSlice []carDetails
 	for i := 0; i < slots; i++ {
-		var car carDetails
-		query := `
-		SELECT car_id,ovr FROM default_customisations
-		WHERE car_id = (
-					SELECT car_id FROM cars
+		var carId string
+		query := ` SELECT car_id FROM cars
 					WHERE class >= ? AND class <= ?
-					ORDER BY RANDOM() LIMIT 1 ); `
-		err := db.QueryExecutor(query, &car, min, max)
+					ORDER BY RANDOM() LIMIT 1 ; `
+		err := db.QueryExecutor(query, &carId, min, max)
 		if err != nil {
 			return nil, errors.New("error in selecting the random car from the db for ai")
 		}
+		var carDefaults model.DefaultCustomisation
+		query = "SELECT * FROM default_customisations WHERE car_id=? "
+		err = db.QueryExecutor(query, &carDefaults, carId)
+		if err != nil {
 
-		carSlice = append(carSlice, car)
+			return nil, err
+		}
+
+		playerCarCustomisations := model.PlayerCarCustomisation{
+			PlayerId:          playerId,
+			CarId:             carId,
+			Power:             carDefaults.Power,
+			Grip:              carDefaults.Grip,
+			ShiftTime:         carDefaults.ShiftTime,
+			Weight:            carDefaults.Weight,
+			OVR:               carDefaults.OVR,
+			Durability:        carDefaults.Durability,
+			NitrousTime:       carDefaults.NitrousTime,
+			ColorCategory:     carDefaults.ColorCategory,
+			ColorType:         carDefaults.ColorType,
+			ColorName:         carDefaults.ColorName,
+			WheelCategory:     carDefaults.WheelCategory,
+			WheelColorName:    carDefaults.WheelColorName,
+			InteriorColorName: carDefaults.InteriorColorName,
+			LPValue:           carDefaults.LPValue,
+		}
+
+		err = db.CreateRecord(&playerCarCustomisations)
+		if err != nil {
+			return nil, err
+		}
+
+		newCarRecord := model.OwnedCars{
+			PlayerId: playerId,
+			CustId:   playerCarCustomisations.CustId,
+			Selected: true,
+		}
+
+		err = db.CreateRecord(&newCarRecord)
+		if err != nil {
+			return nil, err
+		}
+		//Get the customisation id
+
+		carSlice = append(carSlice, carDetails{
+			CustId: playerCarCustomisations.CustId,
+			OVR:    carDefaults.OVR,
+		})
 	}
 
 	fmt.Println("Car slice before sorting is:", carSlice)

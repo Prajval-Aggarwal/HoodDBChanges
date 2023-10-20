@@ -70,9 +70,6 @@ type PlayerCarCustomisation struct {
 	WheelColorName    string     `json:"wheelColorName,omitempty"`
 	InteriorColorName string     `json:"interiorColorName,omitempty"`
 	LPValue           string     `json:"lp_value,omitempty"`
-	CreatedAt         time.Time
-	UpdatedAt         time.Time
-	DeletedAt         gorm.DeletedAt
 }
 
 type PlayerRaceStats struct {

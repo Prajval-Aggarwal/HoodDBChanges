@@ -14,21 +14,24 @@ type ArenaRaceRecord struct {
 	Arena     Arena     `josn:"-" gorm:"references:ArenaId;constraint:OnDelete:CASCADE"`
 	TimeWin   string    `json:"time"`
 	Result    string    `json:"result"`
-	CarId     string    `json:"carId"`
-	Car       Car       `json:"-" gorm:"references:CarId;constraint:OnDelete:CASCADE"`
+	CustId    string    `json:"custId"`
 	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 }
 
 type TempRaceRecords struct {
-	Id       string `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
-	PlayerId string `json:"playerId"`
-	Player   Player `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
-	ArenaId  string `json:"arenaId"`
-	Arena    Arena  `josn:"-" gorm:"references:ArenaId;constraint:OnDelete:CASCADE"`
-	TimeWin  string `json:"time"`
-	Result   string `json:"result"`
-	CarId    string `json:"carId"`
-	Car      Car    `json:"-" gorm:"references:CarId;constraint:OnDelete:CASCADE"`
+	Id        string `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
+	PlayerId  string `json:"playerId"`
+	Player    Player `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
+	ArenaId   string `json:"arenaId"`
+	Arena     Arena  `josn:"-" gorm:"references:ArenaId;constraint:OnDelete:CASCADE"`
+	TimeWin   string `json:"time"`
+	Result    string `json:"result"`
+	CustId    string `json:"custId"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 }
 type ArenaLevelPerks struct {
 	Id          string `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
@@ -36,6 +39,9 @@ type ArenaLevelPerks struct {
 	Coins       int64  `json:"coins"`
 	Cash        int64  `json:"cash"`
 	RepairParts int64  `json:"repairParts"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   gorm.DeletedAt
 }
 
 type ArenaCars struct {

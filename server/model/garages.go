@@ -18,12 +18,13 @@ type Garage struct {
 	Capacity      int64     `json:"capacity"`
 	Locked        bool      `json:"locked,omitempty"`
 	CreatedAt     time.Time `json:"createdAt,omitempty"`
-	UpdatedAt     time.Time
-	DeletedAt     gorm.DeletedAt
+
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 }
 
 type GarageCars struct {
-	Id                string  `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
+	Id        string `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
 	PlayerId  string `json:"playerId"`
 	Player    Player `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
 	GarageId  string `json:"garageId"`
@@ -32,5 +33,4 @@ type GarageCars struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt
-	//PlayerCarCustomisation   PlayerCarCustomisation `json:"-" gorm:"references:PlayerCarCustomisationId;constraint:OnDelete:CASCADE"`
 }

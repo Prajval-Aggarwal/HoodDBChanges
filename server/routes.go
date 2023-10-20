@@ -60,6 +60,9 @@ func ConfigureRoutes(server *Server, socketServer *socketio.Server) {
 	//Car customise routes
 	server.engine.GET("/car/customise/price", player.GetCustomisationPriceHandler)
 
+	//Player arena routes
+	server.engine.GET("/arena/owner", player.GetArenaOwnerHandler)
+
 	//Shop routes
 	server.engine.GET("/get-shop", handler.GetShopHandler)
 
