@@ -401,6 +401,39 @@ paths:
       summary: Get All Arena List
       tags:
       - Arena
+  /arena/owner:
+    get:
+      consumes:
+      - application/json
+      description: Get the details of arena owner
+      parameters:
+      - description: Id of the arena
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "401":
+          description: Unauthorised
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Get arena owner
+      tags:
+      - Arena
   /arena/types:
     get:
       consumes:

@@ -18,14 +18,19 @@ type Garage struct {
 	Capacity      int64     `json:"capacity"`
 	Locked        bool      `json:"locked,omitempty"`
 	CreatedAt     time.Time `json:"createdAt,omitempty"`
+
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 }
 
 type GarageCars struct {
-	gorm.Model
-	PlayerId string `json:"playerId"`
-	Player   Player `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
-	GarageId string `json:"garageId"`
-	Garage   Garage `json:"-" gorm:"references:GarageId;constraint:OnDelete:CASCADE"`
-	CustId   string `json:"custId"`
-	//PlayerCarCustomisation   PlayerCarCustomisation `json:"-" gorm:"references:PlayerCarCustomisationId;constraint:OnDelete:CASCADE"`
+	Id        string `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
+	PlayerId  string `json:"playerId"`
+	Player    Player `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
+	GarageId  string `json:"garageId"`
+	Garage    Garage `json:"-" gorm:"references:GarageId;constraint:OnDelete:CASCADE"`
+	CustId    string `json:"custId"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 }
