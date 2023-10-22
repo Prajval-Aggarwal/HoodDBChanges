@@ -5,7 +5,9 @@ import (
 	"main/server/db"
 	"main/server/model"
 	"main/server/response"
+	"main/server/services/socket"
 	"main/server/utils"
+	"math"
 
 	socketio "github.com/googollee/go-socket.io"
 )
@@ -122,6 +124,86 @@ func BuyCarService(s socketio.Conn, req map[string]interface{}) {
 		response.SocketResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "carBuy", s)
 		return
 	}
+
+	playerResponse, err := socket.GetPlayerDetailsCopy(playerDetails.PlayerId)
+	if err != nil {
+		tx.Rollback()
+		response.SocketResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "carBuy", s)
+		return
+	}
+
+	//braodcasting the updated player details to the front end
+
+	utils.SocketServerInstance.BroadcastToRoom("/", playerId, "playerDetails", *playerResponse)
 	response.SocketResponse(utils.CAR_BOUGHT_SUCESS, utils.HTTP_OK, utils.SUCCESS, carDetails, "carBuy", s)
 
+}
+
+func RepairCarService(s socketio.Conn, reqData map[string]interface{}) {
+
+	fmt.Println("Repair car socket handler called...")
+	playerId := s.Context().(string)
+	custId, ok := reqData["custId"].(string)
+	if !ok {
+		response.SocketResponse(utils.CUSTID_REQUIRED, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "carRepair", s)
+		return
+	}
+
+	playerDetails, err := utils.GetPlayerDetails(playerId)
+	if err != nil {
+
+		response.SocketResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, "carRepair", s)
+		return
+	}
+
+	// Fetch car stats details from the database.
+	var carDetails model.DefaultCustomisation
+
+	query := "SELECT * FROM default_customisation dc JOIN cars c on c.car_id=dc.car_id WHERE dc.cust_id=?"
+	err = db.QueryExecutor(query, &carDetails, custId)
+	if err != nil {
+		response.SocketResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, "carRepair", s)
+		return
+	}
+
+	// Fetch player car stats details from the database.
+	var playerCarStats model.PlayerCarCustomisation
+	query = "SELECT * FROM player_cars_stats WHERE cust_id=? AND player_id=?"
+	err = db.QueryExecutor(query, &playerCarStats, custId, playerId)
+	if err != nil {
+		response.SocketResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "carRepair", s)
+		return
+	}
+
+	// Calculate the difference in durability to repair.
+	durabilityDiff := carDetails.Durability - playerCarStats.Durability
+
+	// Check if the player has enough repair parts to perform the repair.
+	if int64(math.Floor(float64(durabilityDiff)*2.5)) > playerDetails.RepairCurrency {
+		response.SocketResponse(utils.NOT_ENOUGH_REPAIR_PARTS, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "carRepair", s)
+		return
+	}
+
+	// Start a database transaction to handle the car repair.
+	tx := db.BeginTransaction()
+	if tx.Error != nil {
+		response.SocketResponse(tx.Error.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, "carRepair", s)
+		return
+	}
+	// Update the player car's durability to the car's maximum durability.
+	playerCarStats.Durability = carDetails.Durability
+	query = "UPDATE player_car_customisations SET durability = ? WHERE player_id=? AND cust_id=?"
+	err = tx.Exec(query, carDetails.Durability, playerId, custId).Error
+	if err != nil {
+		tx.Rollback() // Rollback the transaction if there's an error.
+		response.SocketResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "carRepair", s)
+		return
+	}
+	if err := tx.Commit().Error; err != nil {
+		response.SocketResponse(tx.Error.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, "carRepair", s)
+		return
+	}
+
+	utils.SocketServerInstance.BroadcastToRoom("/", playerId, "carDetails", carDetails)
+	response.SocketResponse(utils.CAR_REPAIR_SUCCESS, utils.HTTP_OK, utils.SUCCESS, nil, "carRepair", s)
 }

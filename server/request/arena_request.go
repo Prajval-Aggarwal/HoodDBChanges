@@ -86,7 +86,7 @@ func (a GetArenaReq) Validate() error {
 type EndChallengeReq struct {
 	ArenaId   string `json:"arenaId"`
 	PlayerId1 string `json:"playerId"`
-	CarId     string `json:"carId"`
+	CustId    string `json:"custId"`
 	Seconds   int64  `json:"seconds"`
 	MilliSec  int64  `json:"milliSec"`
 	MicroSec  int64  `json:"microSec"`
@@ -95,7 +95,7 @@ type EndChallengeReq struct {
 
 func (a EndChallengeReq) Validate() error {
 	return validation.ValidateStruct(&a,
-		validation.Field(&a.CarId, validation.Required),
+		validation.Field(&a.CustId, validation.Required),
 		validation.Field(&a.PlayerId1, validation.Required),
 		validation.Field(&a.Seconds, validation.Required),
 		validation.Field(&a.MilliSec, validation.Required),

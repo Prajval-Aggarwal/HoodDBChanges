@@ -4,210 +4,210 @@
         "colorType": "fluorescent",
         "colorName": "red",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "fluorescent",
         "colorName": "green",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "fluorescent",
         "colorName": "pink",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "fluorescent",
         "colorName": "yellow",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "fluorescent",
         "colorName": "blue",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "pastel",
         "colorName": "red",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "pastel",
         "colorName": "green",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "pastel",
         "colorName": "pink",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "pastel",
         "colorName": "yellow",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "pastel",
         "colorName": "blue",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "satin",
         "colorName": "red",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "satin",
         "colorName": "green",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "satin",
         "colorName": "pink",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "satin",
         "colorName": "yellow",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "satin",
         "colorName": "blue",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "metal",
         "colorName": "red",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "metal",
         "colorName": "green",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "metal",
         "colorName": "pink",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "metal",
         "colorName": "yellow",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "metal",
         "colorName": "blue",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "gun_Metal",
         "colorName": "red",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "gun_Metal",
         "colorName": "green",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "gun_Metal",
         "colorName": "pink",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "gun_Metal",
         "colorName": "yellow",
         "currType": "coins",
-        "currAmount":2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "gun_Metal",
         "colorName": "blue",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "military",
         "colorName": "basic",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "military",
         "colorName": "black",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "military",
         "colorName": "desert",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "military",
         "colorName": "tram",
         "currType": "coins",
-        "currAmount": 2000.0
+        "currAmount": 1000.0
     },
     {
         "colorCategory": "paint",
         "colorType": "military",
         "colorName": "ucp",
         "currType": "coins",
-        "currAmount":2000.0
+        "currAmount": 1000.0
     },
     {
         "interiorColorName": "white",
@@ -225,7 +225,6 @@
         "currAmount": 1000.0
     },
     {
-
         "interiorColorName": "red",
         "currType": "coins",
         "currAmount": 1000.0

@@ -89,6 +89,7 @@ func SetCarData(carId string, playerId string) error {
 		PlayerId:          playerId,
 		CarId:             carId,
 		Power:             carDefaults.Power,
+		CarLevel:          1,
 		Grip:              carDefaults.Grip,
 		ShiftTime:         carDefaults.ShiftTime,
 		Weight:            carDefaults.Weight,

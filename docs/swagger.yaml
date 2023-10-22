@@ -47,6 +47,23 @@ definitions:
       garageId:
         type: string
     type: object
+  request.EndChallengeReq:
+    properties:
+      arenaId:
+        type: string
+      carId:
+        type: string
+      microSec:
+        type: integer
+      milliSec:
+        type: integer
+      playerId:
+        type: string
+      raceId:
+        type: string
+      seconds:
+        type: integer
+    type: object
   request.ForgotPassRequest:
     properties:
       email:
@@ -373,6 +390,45 @@ paths:
       summary: Update a garage
       tags:
       - Garage
+  /arena/end:
+    post:
+      consumes:
+      - application/json
+      description: Ends the current challenge and saves the data
+      parameters:
+      - description: Player Access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: End Challenge Request
+        in: body
+        name: challengereq
+        required: true
+        schema:
+          $ref: '#/definitions/request.EndChallengeReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "401":
+          description: Unauthorised
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: End Challenge
+      tags:
+      - Arena
   /arena/get:
     get:
       consumes:

@@ -52,6 +52,7 @@ const (
 	NO_CARS_ADDED                    string = "No more cars can be added"
 	UPGRADE_REACHED_MAX_LEVEL        string = "Part reached to its max level"
 	PURCHASE_SUCCESS                 string = "Purchase succesfull"
+	CUSTID_REQUIRED                  string = "Car customisation id is required"
 )
 
 // Garage constants

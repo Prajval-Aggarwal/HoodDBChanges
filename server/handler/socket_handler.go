@@ -33,6 +33,14 @@ func SocketHandler(server *socketio.Server) {
 	server.OnEvent("/", "playerDetails", gateway.SocketAuthMiddleware(socket.GetPlayerDetails))
 
 	//Player Car socket handler
+	server.OnEvent("/", "carUpgrade", gateway.SocketAuthMiddleware(car.UpgradeCarService))
 	server.OnEvent("/", "carBuy", gateway.SocketAuthMiddleware(car.BuyCarService))
+	server.OnEvent("/", "carRepair", gateway.SocketAuthMiddleware(car.RepairCarService))
+
+	//Player car customise
+	server.OnEvent("/", "colorCustomise", gateway.SocketAuthMiddleware(car.ColorCustomization))
+	server.OnEvent("/", "wheelCustomise", gateway.SocketAuthMiddleware(car.WheelCustomize))
+	server.OnEvent("/", "interiorCustomise", gateway.SocketAuthMiddleware(car.InteriorCustomize))
+	server.OnEvent("/", "licenseCustomise", gateway.SocketAuthMiddleware(car.LicenseCustomize))
 
 }

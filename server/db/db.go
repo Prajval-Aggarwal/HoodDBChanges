@@ -27,6 +27,8 @@ func InitDB() *gorm.DB {
 	}
 	Execute(db)
 	AutoMigrateDatabase(db)
+	TriggerFunc(db)
+	TbaleTriggers(db)
 	return db
 
 }

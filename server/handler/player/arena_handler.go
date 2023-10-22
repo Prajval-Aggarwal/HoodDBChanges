@@ -1,10 +1,48 @@
 package handler
 
 import (
+	"main/server/request"
+	"main/server/response"
 	"main/server/services/arena"
+	"main/server/utils"
 
 	"github.com/gin-gonic/gin"
 )
+
+// @Summary End Challenge
+// @Description Ends the current challenge and saves the data
+// @Tags Arena
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Player Access token"
+// @Param challengereq body request.EndChallengeReq true "End Challenge Request"
+// @Success 200 {object} response.Success "Success"
+// @Failure 400 {object} response.Success "Bad request"
+// @Failure  401 {object} response.Success "Unauthorised"
+// @Failure 500 {object} response.Success "Internal server error"
+// @Router /arena/end [post]
+func EndChallengeHandler(ctx *gin.Context) {
+	playerId, exists := ctx.Get(utils.PLAYERID)
+	if !exists {
+
+		response.ShowResponse(utils.UNAUTHORIZED, utils.HTTP_UNAUTHORIZED, utils.FAILURE, nil, ctx)
+		return
+	}
+	var endChallReq request.EndChallengeReq
+	err := utils.RequestDecoding(ctx, &endChallReq)
+	if err != nil {
+		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	err = endChallReq.Validate()
+	if err != nil {
+
+		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+		return
+	}
+	arena.EndChallengeService(ctx, endChallReq, playerId.(string))
+}
 
 // @Summary Get arena owner
 // @Description Get the details of arena owner

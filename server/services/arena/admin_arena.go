@@ -297,6 +297,7 @@ func GiveRandomCar(playerId string, arenaId string, min int64, max int64, slots 
 		playerCarCustomisations := model.PlayerCarCustomisation{
 			PlayerId:          playerId,
 			CarId:             carId,
+			CarLevel:          1,
 			Power:             carDefaults.Power,
 			Grip:              carDefaults.Grip,
 			ShiftTime:         carDefaults.ShiftTime,

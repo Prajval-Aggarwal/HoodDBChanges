@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"main/server/db"
@@ -29,7 +28,6 @@ func AddDummyDataHandler() {
 		{"default_customisations", "server/dummyData/defaultCustomization.json", &[]model.DefaultCustomisation{}},
 		{"race_types", "server/dummyData/raceTypes.json", &[]model.RaceTypes{}},
 		{"race_rewards", "server/dummyData/rewards.json", &[]model.RaceRewards{}},
-		{"rating_multis", "server/dummyData/classMultiplier.json", &[]model.RatingMulti{}},
 		{"arena_level_perks", "server/dummyData/arenaPerks.json", &[]model.ArenaLevelPerks{}},
 	}
 
@@ -55,39 +53,33 @@ func addtoDb(filePath string, modelType interface{}) {
 	switch slice := modelType.(type) {
 	case *[]model.Car:
 		for _, item := range *slice {
-			fmt.Println("Car data:", item)
+			// fmt.Println("Car data:", item)
 			db.CreateRecord(&item)
 		}
 	case *[]model.PartCustomization:
 		// Handle other struct types similarly
 		for _, item := range *slice {
-			fmt.Println("part customization data:", item)
+			// fmt.Println("part customization data:", item)
 			db.CreateRecord(&item)
 		}
 	case *[]model.DefaultCustomisation:
 		for _, item := range *slice {
-			fmt.Println("default customization data:", item)
+			// fmt.Println("default customization data:", item)
 			db.CreateRecord(&item)
 		}
 	case *[]model.RaceRewards:
 		for _, item := range *slice {
-			fmt.Println("win rewards data:", item)
-			db.CreateRecord(&item)
-		}
-
-	case *[]model.RatingMulti:
-		for _, item := range *slice {
-			fmt.Println("rating data:", item)
+			// fmt.Println("win rewards data:", item)
 			db.CreateRecord(&item)
 		}
 	case *[]model.RaceTypes:
 		for _, item := range *slice {
-			fmt.Println("race types data:", item)
+			// fmt.Println("race types data:", item)
 			db.CreateRecord(&item)
 		}
 	case *[]model.ArenaLevelPerks:
 		for _, item := range *slice {
-			fmt.Println("Arena perks are:", item)
+			// fmt.Println("Arena perks are:", item)
 			db.CreateRecord(&item)
 		}
 	default:

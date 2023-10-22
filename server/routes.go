@@ -61,6 +61,7 @@ func ConfigureRoutes(server *Server, socketServer *socketio.Server) {
 	server.engine.GET("/car/customise/price", player.GetCustomisationPriceHandler)
 
 	//Player arena routes
+	server.engine.POST("/arena/end", gateway.AdminAuthorization, player.EndChallengeHandler)
 	server.engine.GET("/arena/owner", player.GetArenaOwnerHandler)
 
 	//Shop routes
