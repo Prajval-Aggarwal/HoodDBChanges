@@ -51,7 +51,7 @@ definitions:
     properties:
       arenaId:
         type: string
-      carId:
+      custId:
         type: string
       microSec:
         type: integer
@@ -67,6 +67,11 @@ definitions:
   request.ForgotPassRequest:
     properties:
       email:
+        type: string
+    type: object
+  request.GetArenaReq:
+    properties:
+      arenaId:
         type: string
     type: object
   request.GuestLoginRequest:
@@ -429,6 +434,45 @@ paths:
       summary: End Challenge
       tags:
       - Arena
+  /arena/enter:
+    post:
+      consumes:
+      - application/json
+      description: Enter arena
+      parameters:
+      - description: Player Access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Id of the arena
+        in: body
+        name: addCarReq
+        required: true
+        schema:
+          $ref: '#/definitions/request.GetArenaReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "401":
+          description: Unauthorised
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Enter the arena
+      tags:
+      - Arena
   /arena/get:
     get:
       consumes:
@@ -524,6 +568,25 @@ paths:
       summary: Get the price of car parts customizations
       tags:
       - Car-Customize
+  /car/get-all:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the list of all car
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Cars list fetched successfully
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Get All Cars List
+      tags:
+      - Car
   /delete-account:
     delete:
       consumes:

@@ -60,7 +60,7 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 		var rewards model.RaceRewards
 		win := false
 
-		query = "SELECT * FROM race_rewards WHERE reward_id=? AND status=?"
+		query = "SELECT * FROM race_rewards WHERE race_id=? AND status=?"
 
 		if winTime.Before(*opponentTime) {
 
@@ -394,7 +394,7 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 					//player won the challenge but not the arena
 					var reward model.RaceRewards
 					var totalRewards = []response.RewardResponse{}
-					query = "SELECT * FROM race_rewards WHERE reward_id=? AND status=?"
+					query = "SELECT * FROM race_rewards WHERE race_id=? AND status=?"
 					err = db.QueryExecutor(query, &reward, endChallReq.RaceId, "win")
 					if err != nil {
 						response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
@@ -450,81 +450,88 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 					}
 					response.ShowResponse(utils.WON, utils.HTTP_OK, utils.SUCCESS, totalRewards, ctx)
 				}
+			} else {
+
+				//test it this else might create error
+
+				//create a record and set the initail win to 1
+				// arenaSeriesRecord := model.ArenaSeries{
+				// 	ArenaId:    endChallReq.ArenaId,
+				// 	PlayerId:   playerId2,
+				// 	WinStreak:  1,
+				// 	LoseStreak: 0,
+				// }
+
+				arenaSeriesRecord := model.PlayerRaceStats{
+					PlayerId:   playerId2,
+					ArenaId:    &endChallReq.ArenaId,
+					WinStreak:  1,
+					LoseStreak: 0,
+				}
+
+				err := db.CreateRecord(&arenaSeriesRecord)
+				if err != nil {
+					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+					return
+				}
+
+				var reward model.RaceRewards
+				var totalRewards = []response.RewardResponse{}
+				query = "SELECT * FROM race_rewards WHERE race_id=? AND status=?"
+				err = db.QueryExecutor(query, &reward, endChallReq.RaceId, "win")
+				if err != nil {
+					response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+					return
+				}
+
+				playerLevel, err := EarnedRewards(playerId2, ctx, reward)
+				if err != nil {
+					response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+					return
+				}
+
+				tempRecord := &model.TempRaceRecords{
+					PlayerId: playerId2,
+					ArenaId:  endChallReq.ArenaId,
+					TimeWin:  TimeInString,
+					Result:   "win",
+					CustId:   endChallReq.CustId,
+				}
+				err = db.CreateRecord(&tempRecord)
+				if err != nil {
+					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+					return
+				}
+				if playerLevel != nil {
+
+					totalRewards = append(totalRewards, response.RewardResponse{
+						RewardName: "level",
+						RewardData: response.RewardData{
+							Coins:      playerLevel.Coins,
+							Level:      playerLevel.Level,
+							XPRequired: playerLevel.XPRequired,
+						},
+					})
+				}
+
+				totalRewards = append(totalRewards, response.RewardResponse{
+					RewardName: raceType.RaceName,
+					RewardData: response.RewardData{
+						Coins:          reward.Coins,
+						Cash:           reward.Cash,
+						RepairCurrency: reward.RepairCurrency,
+						XPGained:       reward.XPGained,
+						Status:         reward.Status,
+					},
+				})
+				err = UpdatePlayerRaceHistory(playerId2, ctx, endChallReq, true)
+				if err != nil {
+					response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+					return
+				}
+				response.ShowResponse(utils.WON, utils.HTTP_OK, utils.SUCCESS, totalRewards, ctx)
+
 			}
-			// } else {
-
-			// 	//test it this else might create error
-
-			// 	//create a record and set the initail win to 1
-			// 	arenaSeriesRecord := model.ArenaSeries{
-			// 		ArenaId:    endChallReq.ArenaId,
-			// 		PlayerId:   playerId2,
-			// 		WinStreak:  1,
-			// 		LoseStreak: 0,
-			// 	}
-			// 	err := db.CreateRecord(&arenaSeriesRecord)
-			// 	if err != nil {
-			// 		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-			// 		return
-			// 	}
-
-			// 	var reward model.RaceRewards
-			// 	var totalRewards = []response.RewardResponse{}
-			// 	query = "SELECT * FROM race_rewards WHERE reward_id=? AND status=?"
-			// 	err = db.QueryExecutor(query, &reward, endChallReq.RaceId, "win")
-			// 	if err != nil {
-			// 		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-			// 		return
-			// 	}
-
-			// 	playerLevel, err := EarnedRewards(playerId2, ctx, reward)
-			// 	if err != nil {
-			// 		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-			// 		return
-			// 	}
-
-			// 	tempRecord := &model.TempRaceRecords{
-			// 		PlayerId: playerId2,
-			// 		ArenaId:  endChallReq.ArenaId,
-			// 		TimeWin:  TimeInString,
-			// 		Result:   "win",
-			// 		CustId:   endChallReq.CustId,
-			// 	}
-			// 	err = db.CreateRecord(&tempRecord)
-			// 	if err != nil {
-			// 		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-			// 		return
-			// 	}
-			// 	if playerLevel != nil {
-
-			// 		totalRewards = append(totalRewards, response.RewardResponse{
-			// 			RewardName: "level",
-			// 			RewardData: response.RewardData{
-			// 				Coins:      playerLevel.Coins,
-			// 				Level:      playerLevel.Level,
-			// 				XPRequired: playerLevel.XPRequired,
-			// 			},
-			// 		})
-			// 	}
-
-			// 	totalRewards = append(totalRewards, response.RewardResponse{
-			// 		RewardName: raceType.RaceName,
-			// 		RewardData: response.RewardData{
-			// 			Coins:       reward.Coins,
-			// 			Cash:        reward.Cash,
-			// 			RepairParts: reward.RepairParts,
-			// 			XPGained:    reward.XPGained,
-			// 			Status:      reward.Status,
-			// 		},
-			// 	})
-			// 	err = UpdatePlayerRaceHistory(playerId2, ctx, endChallReq, true)
-			// 	if err != nil {
-			// 		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-			// 		return
-			// 	}
-			// 	response.ShowResponse(utils.WON, utils.HTTP_OK, utils.SUCCESS, totalRewards, ctx)
-
-			// }
 
 		} else {
 			// fghddfhdfghdfhdfghdfgh
@@ -563,7 +570,7 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 			//player Lost
 			var reward model.RaceRewards
 			var totalRewards = []response.RewardResponse{}
-			query = "SELECT * FROM race_rewards WHERE reward_id=? AND status=?"
+			query = "SELECT * FROM race_rewards WHERE race_id=? AND status=?"
 			err = db.QueryExecutor(query, &reward, endChallReq.RaceId, "lost")
 			if err != nil {
 				response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
@@ -611,7 +618,7 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 
 				fmt.Println("Player lost the arena and also lost the last race")
 				var reward1 model.RaceRewards
-				query := "SELECT * FROM race_rewards WHERE reward_id=? AND status=?"
+				query := "SELECT * FROM race_rewards WHERE race_id=? AND status=?"
 				err := db.QueryExecutor(query, &reward1, test.RaceId, "lost")
 				if err != nil {
 					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
@@ -683,7 +690,7 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 				}
 
 				var reward1 model.RaceRewards
-				query := "SELECT * FROM race_rewards WHERE reward_id=? AND status=?"
+				query := "SELECT * FROM race_rewards WHERE race_id=? AND status=?"
 
 				err := db.QueryExecutor(query, &reward1, test.RaceId, "win")
 				if err != nil {
@@ -738,7 +745,7 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 }
 func BuildArenaRewardResponse(test model.RaceTypes, ctx *gin.Context, playerId2 string, endChallReq request.EndChallengeReq, status string) ([]response.RewardResponse, error) {
 	var reward1, reward2 model.RaceRewards
-	query := "SELECT * FROM race_rewards WHERE reward_id=? AND status=?"
+	query := "SELECT * FROM race_rewards WHERE race_id=? AND status=?"
 	err := db.QueryExecutor(query, &reward1, test.RaceId, status)
 	if err != nil {
 		return nil, err
@@ -966,6 +973,26 @@ func GetArenaOwnerService(ctx *gin.Context, arenaId string) {
 		Class             int64   `json:"class"`
 	}
 
+	type tempStr struct {
+		CustId            string  `json:"custId"  gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
+		CarId             string  `json:"carId,omitempty"`
+		Power             int64   `json:"power,omitempty"`
+		Grip              int64   `json:"grip,omitempty"`
+		ShiftTime         float64 `json:"shiftTime,omitempty"`
+		Weight            int64   `json:"weight,omitempty"`
+		OVR               float64 `json:"or,omitempty"` //overall rating of the car
+		Durability        int64   `json:"Durability,omitempty"`
+		NitrousTime       float64 `json:"nitrousTime,omitempty"` //increased when nitrous is upgraded
+		ColorCategory     string  `json:"colorCategory,omitempty"`
+		ColorType         int64   `json:"colorType,omitempty"`
+		ColorName         int64   `json:"colorName,omitempty"`
+		WheelCategory     string  `json:"wheelCategory,omitempty"`
+		WheelColorName    int64   `json:"wheelColorName,omitempty"`
+		InteriorColorName int64   `json:"interiorColorName,omitempty"`
+		LPValue           string  `json:"lp_value,omitempty"`
+		Class             int64   `json:"class"`
+	}
+
 	// Declare a response struct to format the final response
 	var resp struct {
 		PlayerId     string `json:"playerId"`
@@ -989,11 +1016,11 @@ func GetArenaOwnerService(ctx *gin.Context, arenaId string) {
 			Durability        int64   `json:"Durability,omitempty"`
 			NitrousTime       float64 `json:"nitrousTime,omitempty"` //increased when nitrous is upgraded
 			ColorCategory     string  `json:"colorCategory,omitempty"`
-			ColorType         string  `json:"colorType,omitempty"`
-			ColorName         string  `json:"colorName,omitempty"`
+			ColorType         int64   `json:"colorType,omitempty"`
+			ColorName         int64   `json:"colorName,omitempty"`
 			WheelCategory     string  `json:"wheelCategory,omitempty"`
-			WheelColorName    string  `json:"wheelColorName,omitempty"`
-			InteriorColorName string  `json:"interiorColorName,omitempty"`
+			WheelColorName    int64   `json:"wheelColorName,omitempty"`
+			InteriorColorName int64   `json:"interiorColorName,omitempty"`
 			LPValue           string  `json:"lp_value,omitempty"`
 			Class             int64   `json:"class"`
 		} `json:"cars"`
@@ -1023,6 +1050,7 @@ func GetArenaOwnerService(ctx *gin.Context, arenaId string) {
 	}
 
 	// Query to fetch car customizations associated with the player's records
+
 	query = `SELECT pcc.*,c.class
         FROM player_car_customisations pcc
         JOIN cars c ON c.car_id=pcc.car_id 
@@ -1037,7 +1065,86 @@ func GetArenaOwnerService(ctx *gin.Context, arenaId string) {
 	}
 
 	// Append carStruct2 to the 'resp.Cars' slice
-	resp.Cars = append(resp.Cars, carStruct2...)
+
+	for _, details := range carStruct2 {
+		var temp tempStr
+		temp.CustId = details.CustId
+		temp.CarId = details.CarId
+		temp.Power = details.Power
+		temp.Grip = details.Grip
+		temp.ShiftTime = details.ShiftTime
+		temp.Weight = details.Weight
+		temp.OVR = details.OVR
+		temp.Durability = details.Durability
+		temp.NitrousTime = details.NitrousTime
+		temp.ColorCategory = details.ColorCategory
+		temp.WheelCategory = details.WheelCategory
+		temp.Class = details.Class
+		temp.LPValue = details.LPValue
+		switch details.ColorType {
+		case "default":
+			temp.ColorType = 1
+		case "fluorescent":
+			temp.ColorType = 2
+		case "pastel":
+			temp.ColorType = 3
+		case "gun_metal":
+			temp.ColorType = 4
+		case "satin":
+			temp.ColorType = 5
+		case "metal":
+			temp.ColorType = 6
+		case "military":
+			temp.ColorType = 7
+		}
+
+		switch details.ColorName {
+		case "red":
+			temp.ColorName = 1
+		case "green":
+			temp.ColorName = 2
+		case "pink":
+			temp.ColorName = 3
+		case "yellow":
+			temp.ColorName = 4
+		case "blue":
+			temp.ColorName = 5
+		}
+
+		switch details.WheelColorName {
+		case "black":
+			temp.WheelColorName = 1
+		case "blue":
+			temp.WheelColorName = 2
+		case "green":
+			temp.WheelColorName = 3
+		case "pink":
+			temp.WheelColorName = 4
+		case "red":
+			temp.WheelColorName = 5
+		case "yellow":
+			temp.WheelColorName = 6
+		}
+
+		switch details.InteriorColorName {
+		case "white":
+			temp.InteriorColorName = 1
+		case "pink":
+			temp.InteriorColorName = 2
+		case "green":
+			temp.InteriorColorName = 3
+		case "red":
+			temp.InteriorColorName = 4
+		case "blue":
+			temp.InteriorColorName = 5
+		case "yellow":
+			temp.InteriorColorName = 6
+		}
+
+		resp.Cars = append(resp.Cars, temp)
+	}
+
+	// resp.Cars = append(resp.Cars, carStruct2...)
 
 	// Show the final response with success message
 	response.ShowResponse(utils.DATA_FETCH_SUCCESS, utils.HTTP_OK, utils.SUCCESS, resp, ctx)

@@ -29,6 +29,10 @@ func ConfigureRoutes(server *Server, socketServer *socketio.Server) {
 	//web socket handler
 	server.engine.GET("/socket.io/*any", gin.WrapH(socketServer))
 
+	//Admin Login Route
+	server.engine.POST("/forgot-password", admin.ForgotPasswordHandler)
+	server.engine.PATCH("/reset-password", admin.ResetPasswordHandler)
+
 	//Auth routes
 	server.engine.POST("/guest-login", admin.GuestLoginHandler)
 	server.engine.POST("/login", admin.LoginHandler)
@@ -57,12 +61,14 @@ func ConfigureRoutes(server *Server, socketServer *socketio.Server) {
 	//Player
 	server.engine.GET("/level", player.GetLevelHandler)
 
-	//Car customise routes
+	//Car routes
+	server.engine.GET("/car/get-all", player.GetAllCarsHandler)
 	server.engine.GET("/car/customise/price", player.GetCustomisationPriceHandler)
 
 	//Player arena routes
 	server.engine.POST("/arena/end", gateway.AdminAuthorization, player.EndChallengeHandler)
 	server.engine.GET("/arena/owner", player.GetArenaOwnerHandler)
+	server.engine.POST("/arena/enter", gateway.AdminAuthorization, player.EnterArenaHandler)
 
 	//Shop routes
 	server.engine.GET("/get-shop", handler.GetShopHandler)

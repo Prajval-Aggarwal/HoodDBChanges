@@ -5,6 +5,7 @@ import (
 	"main/server/gateway"
 	"main/server/services/socket"
 	"main/server/services/socket/car"
+	"main/server/services/socket/shop"
 
 	socketio "github.com/googollee/go-socket.io"
 )
@@ -42,5 +43,10 @@ func SocketHandler(server *socketio.Server) {
 	server.OnEvent("/", "wheelCustomise", gateway.SocketAuthMiddleware(car.WheelCustomize))
 	server.OnEvent("/", "interiorCustomise", gateway.SocketAuthMiddleware(car.InteriorCustomize))
 	server.OnEvent("/", "licenseCustomise", gateway.SocketAuthMiddleware(car.LicenseCustomize))
+
+	server.OnEvent("/", "checkSum", gateway.SocketAuthMiddleware(socket.AmountCheckSum))
+
+	//store connection
+	server.OnEvent("/", "buyStore", gateway.SocketAuthMiddleware(shop.BuyFromShop))
 
 }

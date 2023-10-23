@@ -1,6 +1,7 @@
 package response
 
 type CarRes struct {
+	CustId   string `json:"custId,omitempty"`
 	CarId    string `json:"carId,omitempty"`
 	CarName  string `json:"carName,omitempty"`
 	Rarity   int64  `json:"rarity,omitempty"`
@@ -11,7 +12,7 @@ type CarRes struct {
 			Amount       int64 `json:"amount,omitempty"`
 			PremiumBuy   int64 `json:"premiumBuy,omitempty"`
 		} `json:"price,omitempty"`
-		Customization []Customization `json:"carLooks,omitempty"`
+		Customization []Customization `json:"-"`
 	} `json:"defaultData,omitempty"`
 	CarCurrentData struct {
 		Stats         Stats           `json:"stats,omitempty"`
@@ -33,11 +34,13 @@ type Stats struct {
 }
 
 type Customization struct {
-	Part          string `json:"part,omitempty"`
-	ColorCategory string `json:"colorCategory,omitempty"`
-	ColorType     string `json:"colorType,omitempty"`
-	ColorName     string `json:"colorName,omitempty"`
-	Value         string `json:"value,omitempty"`
+	ColorCategory     string `json:"colorCategory,omitempty"`
+	ColorType         string `json:"colorType,omitempty"`
+	ColorName         string `json:"colorName,omitempty"`
+	WheelCategory     string `json:"wheelCategory,omitempty"`
+	WheelColorName    string `json:"wheelColorName,omitempty"`
+	InteriorColorName string `json:"interiorColorName,omitempty"`
+	LPValue           string `json:"lp_value,omitempty"`
 }
 
 type UpgradeResponse struct {

@@ -13,15 +13,8 @@ const (
 	GARAGE_NOT_FOUND       string = "Garage not found"
 	GARAGE_NOT_OWNED       string = "Garage is not owned"
 )
+
 const (
-	EASY_PERK   string = "@every 30m"
-	MEDIUM_PERK string = "@every 3h"
-	HARD_PERK   string = "@every 7h"
-
-	EASY_ARENA_SLOT   int64 = 3
-	MEDIUM_ARENA_SLOT int64 = 5
-	HARD_ARENA_SLOT   int64 = 7
-
 	ARENA_ADD_SUCCESS     string = "Arena Added successfully"
 	ARENA_DELETE_SUCCESS  string = "Arena Deleted successfully"
 	ARENA_UPDATE_SUCCESS  string = "Arena Updated successfully"

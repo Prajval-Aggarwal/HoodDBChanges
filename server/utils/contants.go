@@ -79,7 +79,19 @@ const (
 )
 
 // Arena constants
+const (
+	EASY_PERK   string = "@every 30m"
+	MEDIUM_PERK string = "@every 3h"
+	HARD_PERK   string = "@every 7h"
 
+	EASY_PERK_MINUTES   int = 30
+	MEDIUM_PERK_MINUTES int = 180
+	HARD_PERK_MINUTES   int = 420
+
+	EASY_ARENA_SLOT   int64 = 3
+	MEDIUM_ARENA_SLOT int64 = 5
+	HARD_ARENA_SLOT   int64 = 7
+)
 const (
 	AdminLogin = iota + 1
 	PlayerLogin
@@ -130,7 +142,8 @@ const (
 type COLOR_TYPE int
 
 const (
-	FLUORESCENT COLOR_TYPE = iota + 1
+	DEFAULT COLOR_TYPE = iota + 1
+	FLUORESCENT
 	PASTEL
 	GUN_METAL
 	SATIN

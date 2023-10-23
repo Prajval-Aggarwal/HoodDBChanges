@@ -48,7 +48,7 @@ func GetPlayerDetails(s socketio.Conn, req map[string]interface{}) {
 	LEFT JOIN player_race_stats prh ON prh.player_id = p.player_id
 	LEFT JOIN player_levels pl ON pl.level = p.level + 1
 	LEFT JOIN player_levels plPrev ON plPrev.level = p.level
-	WHERE p.player_id = ?
+	WHERE p.player_id = ? ORDER BY prh.updated_at DESC
 	GROUP BY
 		p.player_id,
 		p.player_name,
@@ -65,7 +65,9 @@ func GetPlayerDetails(s socketio.Conn, req map[string]interface{}) {
 		prh.td_won,
 		prh.total_td_played,
 		pl.xp_required,
-		plPrev.xp_required;`
+		plPrev.xp_required
+		prh.updated_at
+ORDER BY prh.updated_at DESC LIMIT 1;`
 	playerResponse, err := db.ResponseQuery(query, playerId, playerId)
 	if err != nil {
 		fmt.Println("error is ", err.Error())
@@ -132,7 +134,9 @@ func GetPlayerDetailsCopy(playerId string) (*response.PlayerResposne, error) {
 		prh.td_won,
 		prh.total_td_played,
 		pl.xp_required,
-		plPrev.xp_required;`
+		plPrev.xp_required
+		prh.updated_at
+ORDER BY prh.updated_at DESC LIMIT 1;`
 	playerResponse, err := db.ResponseQuery(query, playerId, playerId)
 	if err != nil {
 		return nil, err

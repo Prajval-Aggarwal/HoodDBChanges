@@ -44,6 +44,40 @@ func EndChallengeHandler(ctx *gin.Context) {
 	arena.EndChallengeService(ctx, endChallReq, playerId.(string))
 }
 
+// @Summary Enter the arena
+// @Description Enter arena
+// @Tags Arena
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Player Access token"
+// @Param addCarReq body request.GetArenaReq true "Id of the arena"
+// @Success 200 {object} response.Success "Success"
+// @Failure 400 {object} response.Success "Bad request"
+// @Failure  401 {object} response.Success "Unauthorised"
+// @Failure 500 {object} response.Success "Internal server error"
+// @Router /arena/enter [post]
+func EnterArenaHandler(ctx *gin.Context) {
+	playerId, exists := ctx.Get(utils.PLAYERID)
+	if !exists {
+		response.ShowResponse(utils.UNAUTHORIZED, utils.HTTP_UNAUTHORIZED, utils.FAILURE, nil, ctx)
+		return
+	}
+	var enterReq request.GetArenaReq
+	err := utils.RequestDecoding(ctx, &enterReq)
+	if err != nil {
+		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	err = enterReq.Validate()
+	if err != nil {
+		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	arena.EnterArenaService(ctx, enterReq, playerId.(string))
+}
+
 // @Summary Get arena owner
 // @Description Get the details of arena owner
 // @Tags Arena

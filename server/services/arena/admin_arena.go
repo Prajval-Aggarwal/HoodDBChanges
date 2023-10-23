@@ -10,6 +10,7 @@ import (
 	"main/server/utils"
 	"sort"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -223,6 +224,44 @@ func GetAllArenaService(ctx *gin.Context) {
 	if err != nil {
 		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 		return
+	}
+	var arenaResponseList []response.ArenaResponse
+
+	for _, arena := range ArenaList {
+		var arenaReward model.ArenaLevelPerks
+		query := "SELECT * FROM arena_level_perks WHERE arena_level=?"
+		err = db.QueryExecutor(query, &arenaReward, arena.ArenaLevel)
+		if err != nil {
+			response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+			return
+		}
+		arenaResponse := response.ArenaResponse{
+			ArenaId:    arena.ArenaId,
+			ArenaName:  arena.ArenaName,
+			ArenaLevel: arena.ArenaLevel,
+			Longitude:  arena.Longitude,
+			Latitude:   arena.Latitude,
+			RewardData: arenaReward,
+		}
+		var res time.Duration
+		switch arena.ArenaLevel {
+		case int64(utils.EASY):
+			// fmt.Println(time.Duration(utils.EASY_PERK_MINUTES) * time.Minute)
+			res = time.Duration(utils.EASY_PERK_MINUTES) * time.Minute
+			arenaResponse.NumberOfRaces = 3
+
+		case int64(utils.MEDIUM):
+			res = time.Duration(utils.MEDIUM_PERK_MINUTES) * time.Minute
+			arenaResponse.NumberOfRaces = 5
+		case int64(utils.HARD):
+			res = time.Duration(utils.HARD_PERK_MINUTES) * time.Minute
+			arenaResponse.NumberOfRaces = 7
+		}
+
+		arenaResponse.RewardTime = res.String()
+
+		arenaResponseList = append(arenaResponseList, arenaResponse)
+
 	}
 
 	var totalCount int
