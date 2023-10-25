@@ -1196,3 +1196,69 @@ func EnterArenaService(ctx *gin.Context, enterReq request.GetArenaReq, playerId 
 	// Show a success response if all checks and updates are completed
 	response.ShowResponse("Successfully", utils.HTTP_OK, utils.SUCCESS, nil, ctx)
 }
+
+func AddCarToSlotService(ctx *gin.Context, addCarReq request.AddCarArenaRequest, playerId string) {
+	// Check if the car is bought by the player
+	query := "SELECT EXISTS(SELECT * FROM owned_cars WHERE player_id = ? AND cust_id = ?)"
+	if !utils.IsExisting(query, playerId, addCarReq.CustId) {
+		response.ShowResponse(utils.CAR_NOT_OWNED, utils.HTTP_NOT_FOUND, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	// Check if the player owns the arena
+	query = "SELECT EXISTS(SELECT * FROM player_race_records WHERE player_id = ? AND arena_id = ?)"
+	if !utils.IsExisting(query, playerId, addCarReq.ArenaId) {
+		response.ShowResponse(utils.ARENA_NOT_OWNED, utils.HTTP_NOT_FOUND, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	// Check that it should not add more cars than required slots for the arena
+	var arenaDetails model.Arena
+	err := db.FindById(&arenaDetails, addCarReq.ArenaId, "arena_id")
+	if err != nil {
+		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	var carCount int64
+	query = "SELECT COUNT(*) FROM arena_cars WHERE player_id = ? AND arena_id = ?"
+	err = db.QueryExecutor(query, &carCount, playerId, addCarReq.ArenaId)
+	if err != nil {
+		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	// Check the slot limit for the arena level and ensure it's not exceeded
+	var maxSlots int64
+	switch arenaDetails.ArenaLevel {
+	case int64(utils.EASY):
+		maxSlots = utils.EASY_ARENA_SLOT
+	case int64(utils.MEDIUM):
+		maxSlots = utils.MEDIUM_ARENA_SLOT
+	case int64(utils.HARD):
+		maxSlots = utils.HARD_ARENA_SLOT
+	default:
+		response.ShowResponse("Invalid arena level", utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	if carCount == maxSlots {
+		response.ShowResponse(utils.NO_CARS_ADDED, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	// Create a record in the car_slots table
+	carSlot := model.ArenaCars{
+		PlayerId: playerId,
+		ArenaId:  addCarReq.ArenaId,
+		CustId:   addCarReq.CustId,
+	}
+
+	err = db.CreateRecord(&carSlot)
+	if err != nil {
+		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	response.ShowResponse(utils.CAR_ADDED_SUCCESS, utils.HTTP_OK, utils.SUCCESS, nil, ctx)
+}

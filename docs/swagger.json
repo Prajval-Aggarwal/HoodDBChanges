@@ -375,6 +375,65 @@
                 }
             }
         },
+        "/arena/add-car": {
+            "post": {
+                "description": "Add a car to the player's slot in a specific arena",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Arena"
+                ],
+                "summary": "Add a car to arena",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Player Access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Add car to slot request payload",
+                        "name": "addCarReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AddCarArenaRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Car added to slot successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Success"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request. Invalid payload",
+                        "schema": {
+                            "$ref": "#/definitions/response.Success"
+                        }
+                    },
+                    "404": {
+                        "description": "Car or player not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Success"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Success"
+                        }
+                    }
+                }
+            }
+        },
         "/arena/end": {
             "post": {
                 "description": "Ends the current challenge and saves the data",
@@ -1276,6 +1335,17 @@
                 },
                 "longitude": {
                     "type": "number"
+                }
+            }
+        },
+        "request.AddCarArenaRequest": {
+            "type": "object",
+            "properties": {
+                "arenaId": {
+                    "type": "string"
+                },
+                "custId": {
+                    "type": "string"
                 }
             }
         },

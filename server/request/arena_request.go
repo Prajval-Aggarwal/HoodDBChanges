@@ -64,13 +64,13 @@ func (a ReplaceReq) Validate() error {
 
 type AddCarArenaRequest struct {
 	ArenaId string `json:"arenaId"`
-	CarId   string `json:"carId"`
+	CustId  string `json:"custId"`
 }
 
 func (a AddCarArenaRequest) Validate() error {
 	return validation.ValidateStruct(&a,
 		validation.Field(&a.ArenaId, validation.Required),
-		validation.Field(&a.CarId, validation.Required),
+		validation.Field(&a.CustId, validation.Required),
 	)
 }
 

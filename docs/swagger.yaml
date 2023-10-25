@@ -11,6 +11,13 @@ definitions:
       longitude:
         type: number
     type: object
+  request.AddCarArenaRequest:
+    properties:
+      arenaId:
+        type: string
+      custId:
+        type: string
+    type: object
   request.AddGarageRequest:
     properties:
       coinsRequired:
@@ -395,6 +402,45 @@ paths:
       summary: Update a garage
       tags:
       - Garage
+  /arena/add-car:
+    post:
+      consumes:
+      - application/json
+      description: Add a car to the player's slot in a specific arena
+      parameters:
+      - description: Player Access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Add car to slot request payload
+        in: body
+        name: addCarReq
+        required: true
+        schema:
+          $ref: '#/definitions/request.AddCarArenaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Car added to slot successfully
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request. Invalid payload
+          schema:
+            $ref: '#/definitions/response.Success'
+        "404":
+          description: Car or player not found
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Add a car to arena
+      tags:
+      - Arena
   /arena/end:
     post:
       consumes:
