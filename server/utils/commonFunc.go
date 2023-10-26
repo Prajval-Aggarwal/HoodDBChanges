@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"main/server/db"
 	"main/server/model"
+	"main/server/response"
 	"math"
 	"math/rand"
 	"os"
@@ -71,21 +72,15 @@ func HashPassword(password string) (*string, error) {
 }
 
 func SetCarData(carId string, playerId string) error {
-	tx := db.BeginTransaction()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
+	fmt.Println("asdabsdbjashbdjbsakjdbk")
 	var carDefaults model.DefaultCustomisation
 	query := "SELECT * FROM default_customisations WHERE car_id=? "
 	err := db.QueryExecutor(query, &carDefaults, carId)
 	if err != nil {
-
 		return err
 	}
 
-	playerCarCustomisations := model.PlayerCarCustomisation{
+	playerCarCustomisations := &model.PlayerCarCustomisation{
 		PlayerId:          playerId,
 		CarId:             carId,
 		Power:             carDefaults.Power,
@@ -104,22 +99,27 @@ func SetCarData(carId string, playerId string) error {
 		InteriorColorName: carDefaults.InteriorColorName,
 		LPValue:           carDefaults.LPValue,
 	}
-
+	fmt.Println("playesdfsdr", playerCarCustomisations)
 	err = db.CreateRecord(&playerCarCustomisations)
+	fmt.Println("err", err)
 	if err != nil {
-		tx.Rollback()
+		fmt.Println("error ", err)
 		return err
+	} else {
+		fmt.Println("hellooo")
 	}
+	fmt.Println("player", playerCarCustomisations)
 
 	newCarRecord := model.OwnedCars{
 		PlayerId: playerId,
 		CustId:   playerCarCustomisations.CustId,
 		Selected: true,
 	}
+	fmt.Println("car", newCarRecord)
 
 	err = db.CreateRecord(&newCarRecord)
 	if err != nil {
-		tx.Rollback()
+
 		return err
 	}
 	return nil
@@ -242,13 +242,13 @@ func IsExisting(query string, values ...interface{}) bool {
 	return exists
 }
 
-func TimeConversion(stringFormat string) *time.Time {
+func TimeConversion(stringFormat string) (*time.Time, error) {
 	timeFormat, err := time.Parse("00:00:05.0000", stringFormat)
 	if err != nil {
-		fmt.Println("error in parsing the string format of time")
-		return nil
+		fmt.Println("")
+		return nil, errors.New("error in parsing the string format of time")
 	}
-	return &timeFormat
+	return &timeFormat, nil
 }
 
 func TableIsEmpty(tablename string) bool {
@@ -312,4 +312,94 @@ func GetPlayerDetails(playerId string) (*model.Player, error) {
 		return nil, err
 	}
 	return &playerDetails, nil
+}
+
+func CustomiseMapping(id string, tableName string) (*response.Customization, error) {
+	var carCustomise struct {
+		ColorCategory     string `json:"colorCategory,omitempty"`
+		ColorType         string `json:"colorType,omitempty"`
+		ColorName         string `json:"colorName,omitempty"`
+		WheelCategory     string `json:"wheelCategory,omitempty"`
+		WheelColorName    string `json:"wheelColorName,omitempty"`
+		InteriorColorName string `json:"interiorColorName,omitempty"`
+		LPValue           string `json:"lp_value,omitempty"`
+	}
+
+	var query string
+	if tableName == "default_customisations" {
+		query = "SELECT color_category,color_type,color_name,wheel_category,wheel_color_name,interior_color_name,lp_value FROM " + tableName + " WHERE car_id=?"
+	} else if tableName == "player_car_customisations" {
+		query = "SELECT color_category,color_type,color_name,wheel_category,wheel_color_name,interior_color_name,lp_value FROM " + tableName + " WHERE cust_id=?"
+	}
+
+	err := db.QueryExecutor(query, &carCustomise, id)
+	if err != nil {
+		return nil, err
+	}
+	var respCustomise response.Customization
+
+	respCustomise.LPValue = carCustomise.LPValue
+	respCustomise.ColorCategory = carCustomise.ColorCategory
+	respCustomise.WheelCategory = carCustomise.WheelCategory
+	switch carCustomise.ColorType {
+	case "default":
+		respCustomise.ColorType = 1
+	case "fluorescent":
+		respCustomise.ColorType = 2
+	case "pastel":
+		respCustomise.ColorType = 3
+	case "gun_metal":
+		respCustomise.ColorType = 4
+	case "satin":
+		respCustomise.ColorType = 5
+	case "metal":
+		respCustomise.ColorType = 6
+	case "military":
+		respCustomise.ColorType = 7
+	}
+
+	switch carCustomise.ColorName {
+	case "red":
+		respCustomise.ColorName = 1
+	case "green":
+		respCustomise.ColorName = 2
+	case "pink":
+		respCustomise.ColorName = 3
+	case "yellow":
+		respCustomise.ColorName = 4
+	case "blue":
+		respCustomise.ColorName = 5
+	}
+
+	switch carCustomise.WheelColorName {
+	case "black":
+		respCustomise.WheelColorName = 1
+	case "blue":
+		respCustomise.WheelColorName = 2
+	case "green":
+		respCustomise.WheelColorName = 3
+	case "pink":
+		respCustomise.WheelColorName = 4
+	case "red":
+		respCustomise.WheelColorName = 5
+	case "yellow":
+		respCustomise.WheelColorName = 6
+	}
+
+	switch carCustomise.InteriorColorName {
+	case "white":
+		respCustomise.InteriorColorName = 1
+	case "pink":
+		respCustomise.InteriorColorName = 2
+	case "green":
+		respCustomise.InteriorColorName = 3
+	case "red":
+		respCustomise.InteriorColorName = 4
+	case "blue":
+		respCustomise.InteriorColorName = 5
+	case "yellow":
+		respCustomise.InteriorColorName = 6
+	}
+
+	return &respCustomise, nil
 }

@@ -137,5 +137,15 @@ func AutoMigrateDatabase(db *gorm.DB) {
 		})
 		dbVersion.Version = 13
 	}
+	if dbVersion.Version < 14 {
+		err := db.AutoMigrate(&model.ArenaReward{})
+		if err != nil {
+			panic(err)
+		}
+		db.Where("version=?", dbVersion.Version).Updates(&model.DbVersion{
+			Version: 14,
+		})
+		dbVersion.Version = 14
+	}
 
 }

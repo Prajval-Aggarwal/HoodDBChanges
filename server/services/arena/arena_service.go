@@ -10,6 +10,7 @@ import (
 	"main/server/utils"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -20,12 +21,16 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 	TimeInString := fmt.Sprintf("00:00:%02d.%02d%02d", int(endChallReq.Seconds), int(endChallReq.MilliSec), int(endChallReq.MicroSec))
 
 	//fmt.Println("Time in string", TimeInString)
-	winTime := utils.TimeConversion(TimeInString)
+	winTime, err := utils.TimeConversion(TimeInString)
+	if err != nil {
+		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+		return
+	}
 	//fmt.Println("Win time is", winTime)
 
 	var raceType model.RaceTypes
 	query := "SELECT * FROM race_types WHERE race_id=?"
-	err := db.QueryExecutor(query, &raceType, endChallReq.RaceId)
+	err = db.QueryExecutor(query, &raceType, endChallReq.RaceId)
 	if err != nil {
 		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
 		return
@@ -56,7 +61,11 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 			return // Error handling will be done in the defer block
 		}
 
-		opponentTime := utils.TimeConversion(oppTimeStringFormat)
+		opponentTime, err := utils.TimeConversion(oppTimeStringFormat)
+		if err != nil {
+			response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+			return // Error handling will be done in the defer block
+		}
 		var rewards model.RaceRewards
 		win := false
 
@@ -247,7 +256,12 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 			}
 
 		}
-		opponentTime := utils.TimeConversion(oppTimeStringFormat[(winCount + lostCount)])
+		opponentTime, err := utils.TimeConversion(oppTimeStringFormat[(winCount + lostCount)])
+		if err != nil {
+
+			response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+			return
+		}
 		fmt.Println("Compared opponent time is:", *opponentTime)
 		if winTime.Before(*opponentTime) {
 
@@ -953,45 +967,8 @@ func GetArenaOwnerService(ctx *gin.Context, arenaId string) {
 	}
 
 	// Declare a slice to store car information
-	var carStruct2 []struct {
-		CustId            string  `json:"custId"  gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
-		CarId             string  `json:"carId,omitempty"`
-		Power             int64   `json:"power,omitempty"`
-		Grip              int64   `json:"grip,omitempty"`
-		ShiftTime         float64 `json:"shiftTime,omitempty"`
-		Weight            int64   `json:"weight,omitempty"`
-		OVR               float64 `json:"or,omitempty"` //overall rating of the car
-		Durability        int64   `json:"Durability,omitempty"`
-		NitrousTime       float64 `json:"nitrousTime,omitempty"` //increased when nitrous is upgraded
-		ColorCategory     string  `json:"colorCategory,omitempty"`
-		ColorType         string  `json:"colorType,omitempty"`
-		ColorName         string  `json:"colorName,omitempty"`
-		WheelCategory     string  `json:"wheelCategory,omitempty"`
-		WheelColorName    string  `json:"wheelColorName,omitempty"`
-		InteriorColorName string  `json:"interiorColorName,omitempty"`
-		LPValue           string  `json:"lp_value,omitempty"`
-		Class             int64   `json:"class"`
-	}
 
-	type tempStr struct {
-		CustId            string  `json:"custId"  gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
-		CarId             string  `json:"carId,omitempty"`
-		Power             int64   `json:"power,omitempty"`
-		Grip              int64   `json:"grip,omitempty"`
-		ShiftTime         float64 `json:"shiftTime,omitempty"`
-		Weight            int64   `json:"weight,omitempty"`
-		OVR               float64 `json:"or,omitempty"` //overall rating of the car
-		Durability        int64   `json:"Durability,omitempty"`
-		NitrousTime       float64 `json:"nitrousTime,omitempty"` //increased when nitrous is upgraded
-		ColorCategory     string  `json:"colorCategory,omitempty"`
-		ColorType         int64   `json:"colorType,omitempty"`
-		ColorName         int64   `json:"colorName,omitempty"`
-		WheelCategory     string  `json:"wheelCategory,omitempty"`
-		WheelColorName    int64   `json:"wheelColorName,omitempty"`
-		InteriorColorName int64   `json:"interiorColorName,omitempty"`
-		LPValue           string  `json:"lp_value,omitempty"`
-		Class             int64   `json:"class"`
-	}
+	var carStruct2 []response.CarCustom
 
 	// Declare a response struct to format the final response
 	var resp struct {
@@ -1005,25 +982,7 @@ func GetArenaOwnerService(ctx *gin.Context, arenaId string) {
 				MicroSecond  int `json:"microSeconds"`
 			} `json:"winTimes"`
 		} `json:"arenaRecords"`
-		Cars []struct {
-			CustId            string  `json:"custId"  gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
-			CarId             string  `json:"carId,omitempty"`
-			Power             int64   `json:"power,omitempty"`
-			Grip              int64   `json:"grip,omitempty"`
-			ShiftTime         float64 `json:"shiftTime,omitempty"`
-			Weight            int64   `json:"weight,omitempty"`
-			OVR               float64 `json:"or,omitempty"` //overall rating of the car
-			Durability        int64   `json:"Durability,omitempty"`
-			NitrousTime       float64 `json:"nitrousTime,omitempty"` //increased when nitrous is upgraded
-			ColorCategory     string  `json:"colorCategory,omitempty"`
-			ColorType         int64   `json:"colorType,omitempty"`
-			ColorName         int64   `json:"colorName,omitempty"`
-			WheelCategory     string  `json:"wheelCategory,omitempty"`
-			WheelColorName    int64   `json:"wheelColorName,omitempty"`
-			InteriorColorName int64   `json:"interiorColorName,omitempty"`
-			LPValue           string  `json:"lp_value,omitempty"`
-			Class             int64   `json:"class"`
-		} `json:"cars"`
+		Cars []response.CarRes `json:"cars"`
 	}
 
 	// Populate the response struct with player and arena details
@@ -1051,7 +1010,7 @@ func GetArenaOwnerService(ctx *gin.Context, arenaId string) {
 
 	// Query to fetch car customizations associated with the player's records
 
-	query = `SELECT pcc.*,c.class
+	query = `SELECT pcc.*,c.class,c.car_name
         FROM player_car_customisations pcc
         JOIN cars c ON c.car_id=pcc.car_id 
         JOIN arena_race_records arr ON arr.cust_id=pcc.cust_id
@@ -1067,84 +1026,25 @@ func GetArenaOwnerService(ctx *gin.Context, arenaId string) {
 	// Append carStruct2 to the 'resp.Cars' slice
 
 	for _, details := range carStruct2 {
-		var temp tempStr
-		temp.CustId = details.CustId
-		temp.CarId = details.CarId
-		temp.Power = details.Power
-		temp.Grip = details.Grip
-		temp.ShiftTime = details.ShiftTime
-		temp.Weight = details.Weight
-		temp.OVR = details.OVR
-		temp.Durability = details.Durability
-		temp.NitrousTime = details.NitrousTime
-		temp.ColorCategory = details.ColorCategory
-		temp.WheelCategory = details.WheelCategory
-		temp.Class = details.Class
-		temp.LPValue = details.LPValue
-		switch details.ColorType {
-		case "default":
-			temp.ColorType = 1
-		case "fluorescent":
-			temp.ColorType = 2
-		case "pastel":
-			temp.ColorType = 3
-		case "gun_metal":
-			temp.ColorType = 4
-		case "satin":
-			temp.ColorType = 5
-		case "metal":
-			temp.ColorType = 6
-		case "military":
-			temp.ColorType = 7
+		carRes := response.CarRes{
+			CustId:  details.CustId,
+			CarId:   details.CarId,
+			CarName: details.CarName,
+			Rarity:  details.Class,
 		}
 
-		switch details.ColorName {
-		case "red":
-			temp.ColorName = 1
-		case "green":
-			temp.ColorName = 2
-		case "pink":
-			temp.ColorName = 3
-		case "yellow":
-			temp.ColorName = 4
-		case "blue":
-			temp.ColorName = 5
-		}
+		carCustomise, _ := utils.CustomiseMapping(details.CustId, "player_car_customisations")
+		carRes.CarCurrentData.Customization = *carCustomise
+		carRes.CarCurrentData.Stats.Power = details.Power
+		carRes.CarCurrentData.Stats.Grip = details.Grip
+		carRes.CarCurrentData.Stats.Weight = details.Weight
+		carRes.CarCurrentData.Stats.ShiftTime = details.ShiftTime
+		carRes.CarCurrentData.Stats.OVR = details.OVR
+		carRes.CarCurrentData.Stats.Durability = details.Durability
+		carRes.Status.Owned = true
+		resp.Cars = append(resp.Cars, carRes)
 
-		switch details.WheelColorName {
-		case "black":
-			temp.WheelColorName = 1
-		case "blue":
-			temp.WheelColorName = 2
-		case "green":
-			temp.WheelColorName = 3
-		case "pink":
-			temp.WheelColorName = 4
-		case "red":
-			temp.WheelColorName = 5
-		case "yellow":
-			temp.WheelColorName = 6
-		}
-
-		switch details.InteriorColorName {
-		case "white":
-			temp.InteriorColorName = 1
-		case "pink":
-			temp.InteriorColorName = 2
-		case "green":
-			temp.InteriorColorName = 3
-		case "red":
-			temp.InteriorColorName = 4
-		case "blue":
-			temp.InteriorColorName = 5
-		case "yellow":
-			temp.InteriorColorName = 6
-		}
-
-		resp.Cars = append(resp.Cars, temp)
 	}
-
-	// resp.Cars = append(resp.Cars, carStruct2...)
 
 	// Show the final response with success message
 	response.ShowResponse(utils.DATA_FETCH_SUCCESS, utils.HTTP_OK, utils.SUCCESS, resp, ctx)
@@ -1198,6 +1098,7 @@ func EnterArenaService(ctx *gin.Context, enterReq request.GetArenaReq, playerId 
 }
 
 func AddCarToSlotService(ctx *gin.Context, addCarReq request.AddCarArenaRequest, playerId string) {
+
 	// Check if the car is bought by the player
 	query := "SELECT EXISTS(SELECT * FROM owned_cars WHERE player_id = ? AND cust_id = ?)"
 	if !utils.IsExisting(query, playerId, addCarReq.CustId) {
@@ -1206,7 +1107,7 @@ func AddCarToSlotService(ctx *gin.Context, addCarReq request.AddCarArenaRequest,
 	}
 
 	// Check if the player owns the arena
-	query = "SELECT EXISTS(SELECT * FROM player_race_records WHERE player_id = ? AND arena_id = ?)"
+	query = "SELECT EXISTS(SELECT * FROM player_race_stats WHERE player_id = ? AND arena_id = ?)"
 	if !utils.IsExisting(query, playerId, addCarReq.ArenaId) {
 		response.ShowResponse(utils.ARENA_NOT_OWNED, utils.HTTP_NOT_FOUND, utils.FAILURE, nil, ctx)
 		return
@@ -1217,6 +1118,13 @@ func AddCarToSlotService(ctx *gin.Context, addCarReq request.AddCarArenaRequest,
 	err := db.FindById(&arenaDetails, addCarReq.ArenaId, "arena_id")
 	if err != nil {
 		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	//check that if the car is already alloted to another arena or not
+	query = "SELECT EXISTS (SELECT * FROM arena_cars WHERE player_id = ? AND cust_id=?)"
+	if utils.IsExisting(query, playerId, addCarReq.CustId) {
+		response.ShowResponse(utils.CAR_ALREADY_ALLOTTED, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
 		return
 	}
 
@@ -1260,5 +1168,157 @@ func AddCarToSlotService(ctx *gin.Context, addCarReq request.AddCarArenaRequest,
 		return
 	}
 
-	response.ShowResponse(utils.CAR_ADDED_SUCCESS, utils.HTTP_OK, utils.SUCCESS, nil, ctx)
+	response.ShowResponse(utils.CAR_ADDED_SUCCESS, utils.HTTP_OK, utils.SUCCESS, carSlot, ctx)
+}
+
+func ReplaceCarService(ctx *gin.Context, replaceReq request.ReplaceReq, playerId string) {
+	// Check if the car is bought by the player and owned by the player
+	query := "SELECT EXISTS(SELECT * FROM owned_cars WHERE player_id = ? AND cust_id = ?)"
+	if !utils.IsExisting(query, playerId, replaceReq.NewCustId) {
+		response.ShowResponse(utils.CAR_NOT_OWNED, utils.HTTP_NOT_FOUND, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	// Check if the player owns the arena
+	query = "SELECT EXISTS(SELECT * FROM player_race_stats WHERE player_id = ? AND arena_id = ?)"
+	if !utils.IsExisting(query, playerId, replaceReq.ArenaId) {
+		response.ShowResponse(utils.ARENA_NOT_OWNED, utils.HTTP_NOT_FOUND, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	//check that if the car is already alloted to another arena or not
+	query = "SELECT EXISTS (SELECT * FROM arena_cars WHERE player_id = ? AND cust_id=?)"
+	if utils.IsExisting(query, playerId, replaceReq.ExistingCustId) {
+		response.ShowResponse(utils.CAR_ALREADY_ALLOTTED, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	// Replace the car in the slot
+	query = "UPDATE arena_cars SET cust_id = ? WHERE player_id = ? AND arena_id = ? AND cust_id="
+	err := db.RawExecutor(query, replaceReq.NewCustId, playerId, replaceReq.ArenaId, replaceReq.ExistingCustId)
+	if err != nil {
+		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	response.ShowResponse(utils.CAR_REPLACED_SUCCESS, utils.HTTP_OK, utils.SUCCESS, replaceReq, ctx)
+}
+
+func ArenaCarService(ctx *gin.Context, playerId string) {
+	var temp1 []response.CarCustom
+	query := `SELECT pc.*,c.class,c.car_name
+				FROM player_car_customisations pc
+				JOIN owned_cars oc ON pc.cust_id = oc.cust_id
+				LEFT JOIN arena_cars ac ON pc.cust_id = ac.cust_id
+				LEFT JOIN cars c ON pc.car_id=c.car_id
+				WHERE oc.player_id = ?
+				AND ac.cust_id IS NULL;`
+
+	err := db.QueryExecutor(query, &temp1, playerId)
+	if err != nil {
+		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+		return
+	}
+	var res []response.CarRes
+	for _, t := range temp1 {
+
+		record := &response.CarRes{
+			CustId:  t.CustId,
+			CarId:   t.CarId,
+			CarName: t.CarName,
+			Rarity:  t.Class,
+		}
+		record.Status.Owned = true
+		record.Status.Purchasable = false
+		record.CarCurrentData.Stats.Power = t.Power
+		record.CarCurrentData.Stats.Grip = t.Grip
+		record.CarCurrentData.Stats.ShiftTime = t.ShiftTime
+		record.CarCurrentData.Stats.Weight = t.Weight
+		record.CarCurrentData.Stats.OVR = t.OVR
+		record.CarCurrentData.Stats.Durability = t.Durability
+		record.CarCurrentData.Stats.NitrousTime = t.NitrousTime
+
+		carCustomise, _ := utils.CustomiseMapping(t.CustId, "player_car_customisations")
+
+		record.CarCurrentData.Customization = *carCustomise
+		res = append(res, *record)
+	}
+
+	response.ShowResponse(utils.DATA_FETCH_SUCCESS, utils.HTTP_OK, utils.SUCCESS, res, ctx)
+
+}
+
+func GetArenaSlotDetailsService(ctx *gin.Context, playerId string, arenaId string) {
+	var arenaSlotData response.ArenaSlotResponse
+
+	//check if the areana is owned by the player or not
+
+	var arenaRewardDetails model.ArenaLevelPerks
+	query := "select ap.* from arena_level_perks ap JOIN arenas a ON a.arena_level=ap.arena_level WHERE a.arena_id=?;"
+	err := db.QueryExecutor(query, &arenaRewardDetails, arenaId)
+	if err != nil {
+		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	arenaSlotData.RewardData = arenaRewardDetails
+	if arenaRewardDetails.ArenaLevel == int64(utils.EASY) {
+		arenaSlotData.TotalSlots = int(utils.EASY_ARENA_SLOT)
+	} else if arenaRewardDetails.ArenaLevel == int64(utils.MEDIUM) {
+		arenaSlotData.TotalSlots = int(utils.MEDIUM_ARENA_SLOT)
+	} else if arenaRewardDetails.ArenaLevel == int64(utils.HARD) {
+		arenaSlotData.TotalSlots = int(utils.HARD_ARENA_SLOT)
+	}
+
+	var arenaWinTime time.Time
+	query = "SELECT win_time FROM owned_battle_arenas WHERE arena_id=?"
+	err = db.QueryExecutor(query, &arenaWinTime, arenaId)
+	if err != nil {
+		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	temp := time.Since(arenaWinTime.Add(24 * time.Hour))
+	arenaSlotData.ArenaWinTime = temp.Abs().String()
+
+	var res []response.CarRes
+
+	var carStruct2 []response.CarCustom
+	query = `SELECT pcc.*,c.class,c.car_name
+        FROM player_car_customisations pcc
+        JOIN cars c ON c.car_id=pcc.car_id 
+        JOIN arena_cars arr ON arr.cust_id=pcc.cust_id
+        WHERE arr.arena_id=? AND arr.player_id=?;`
+
+	// Execute the query and store the result in 'carStruct2'
+	err = db.QueryExecutor(query, &carStruct2, arenaId, playerId)
+	if err != nil {
+		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	for _, details := range carStruct2 {
+		record := &response.CarRes{
+			CustId:  details.CustId,
+			CarId:   details.CarId,
+			CarName: details.CarName,
+			Rarity:  details.Class,
+		}
+
+		carCustomise, _ := utils.CustomiseMapping(details.CustId, "player_car_customisations")
+		record.CarCurrentData.Customization = *carCustomise
+		record.CarCurrentData.Stats.Power = details.Power
+		record.CarCurrentData.Stats.Grip = details.Grip
+		record.CarCurrentData.Stats.Weight = details.Weight
+		record.CarCurrentData.Stats.ShiftTime = details.ShiftTime
+		record.CarCurrentData.Stats.OVR = details.OVR
+		record.CarCurrentData.Stats.Durability = details.Durability
+		record.Status.Owned = true
+
+		res = append(res, *record)
+	}
+	arenaSlotData.CarDetails = res
+
+	response.ShowResponse(utils.DATA_FETCH_SUCCESS, utils.HTTP_OK, utils.SUCCESS, arenaSlotData, ctx)
+
 }

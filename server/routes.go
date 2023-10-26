@@ -68,8 +68,11 @@ func ConfigureRoutes(server *Server, socketServer *socketio.Server) {
 	//Player arena routes
 	server.engine.POST("/arena/end", gateway.AdminAuthorization, player.EndChallengeHandler)
 	server.engine.POST("/arena/add-car", gateway.AdminAuthorization, player.AddCarToSlotHandler)
+	server.engine.PUT("/arena/replace-car", gateway.AdminAuthorization, player.ReplaceCarHandler)
 	server.engine.GET("/arena/owner", player.GetArenaOwnerHandler)
 	server.engine.POST("/arena/enter", gateway.AdminAuthorization, player.EnterArenaHandler)
+	server.engine.GET("/arena/cars", gateway.AdminAuthorization, player.ArenaCarHandler)
+	server.engine.GET("/arena/slots/get", gateway.AdminAuthorization, player.GetArenaSlotDetails)
 
 	//Shop routes
 	server.engine.GET("/get-shop", handler.GetShopHandler)

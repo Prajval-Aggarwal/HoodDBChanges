@@ -63,15 +63,15 @@ func GetAllCarsService(ctx *gin.Context) {
 			response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 			return
 		}
-		var carCustomise []response.Customization
-		query = "SELECT color_category,color_type,color_name,wheel_category,wheel_color_name,interior_color_name,lp_value FROM default_customisations WHERE car_id=?"
-		err = db.QueryExecutor(query, &carCustomise, car.CarId)
+
+		carCust, err := utils.CustomiseMapping(car.CarId, "default_customisations")
 		if err != nil {
 			response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 			return
 		}
+
+		record.Defaults.Customization = *carCust
 		record.Defaults.Stats = carStats
-		record.Defaults.Customization = carCustomise
 		record.Status.Owned = false
 		record.Status.Purchasable = true
 		record.Defaults.Purchase.Amount = int64(car.CurrAmount)

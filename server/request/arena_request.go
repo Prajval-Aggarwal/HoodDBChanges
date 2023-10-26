@@ -51,14 +51,16 @@ func (a UpdateArenaReq) Validate() error {
 }
 
 type ReplaceReq struct {
-	ArenaId string
-	CarId   string
+	ArenaId        string `json:"arenaId"`
+	NewCustId      string `json:"newCustId"`
+	ExistingCustId string `json:"existingCustId"`
 }
 
 func (a ReplaceReq) Validate() error {
 	return validation.ValidateStruct(&a,
 		validation.Field(&a.ArenaId, validation.Required),
-		validation.Field(&a.CarId, validation.Required),
+		validation.Field(&a.NewCustId, validation.Required),
+		validation.Field(&a.ExistingCustId, validation.Required),
 	)
 }
 

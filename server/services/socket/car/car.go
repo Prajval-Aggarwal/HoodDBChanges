@@ -72,12 +72,6 @@ func BuyCarService(s socketio.Conn, req map[string]interface{}) {
 	}
 
 	// Start a database transaction to handle the purchase.
-	tx := db.BeginTransaction()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
 
 	if buyType == carDetails.CurrType {
 		if carDetails.CurrType == "coins" {
@@ -89,11 +83,11 @@ func BuyCarService(s socketio.Conn, req map[string]interface{}) {
 		playerDetails.Cash -= int64(carDetails.PremiumBuy)
 
 	}
+	fmt.Println("Player details is", playerDetails)
 
 	//updating player details
-	err = tx.Where(utils.PLAYER_ID, playerId).Updates(&playerDetails).Error
+	err = db.UpdateRecord(&playerDetails, playerId, "player_id").Error
 	if err != nil {
-		tx.Rollback()
 		response.SocketResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, "carBuy", s)
 
 		return
@@ -101,40 +95,37 @@ func BuyCarService(s socketio.Conn, req map[string]interface{}) {
 
 	//Unequip the currenntluy selected car and euip the recently bought car
 	query := "UPDATE owned_cars SET selected = false WHERE player_id=? AND selected=true"
-	err = tx.Exec(query, playerId).Error
+	err = db.RawExecutor(query, playerId)
 	if err != nil {
-		tx.Rollback()
 		response.SocketResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, "carBuy", s)
-
 		return
 	}
+	fmt.Println("asvdjadjsajd")
 
 	//finding the default customisation for that car
 	//Adding these default to player_car_customisations
 	//Also give a garage to that person
 	err = utils.SetCarData(carId, playerId)
 	if err != nil {
-		tx.Rollback()
+		fmt.Println("error is", err)
 		response.SocketResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, "carBuy", s)
 		return
 	}
-	err = tx.Commit().Error
-	if err != nil {
-		tx.Rollback()
-		response.SocketResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "carBuy", s)
-		return
-	}
+	fmt.Println("ajsvdjajshlalvalv")
 
 	playerResponse, err := socket.GetPlayerDetailsCopy(playerDetails.PlayerId)
 	if err != nil {
-		tx.Rollback()
 		response.SocketResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "carBuy", s)
 		return
 	}
 
+	fmt.Println("Player Response", *playerResponse)
 	//braodcasting the updated player details to the front end
 
-	utils.SocketServerInstance.BroadcastToRoom("/", playerId, "playerDetails", *playerResponse)
+	if !utils.SocketServerInstance.BroadcastToRoom("/", playerId, "playerDetails", *playerResponse) {
+		fmt.Println("advjabdjkjasd")
+		return
+	}
 	response.SocketResponse(utils.CAR_BOUGHT_SUCESS, utils.HTTP_OK, utils.SUCCESS, carDetails, "carBuy", s)
 
 }

@@ -65,3 +65,15 @@ type Arena struct {
 	UpdatedAt  time.Time
 	DeletedAt  gorm.DeletedAt
 }
+
+type ArenaReward struct {
+	Id             string `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
+	ArenaId        string `json:"arenaId"`
+	PlayerId       string `json:"playerId"`
+	Coins          int64  `json:"coins"`
+	Cash           int64  `json:"cash"`
+	RepairCurrency int64  `json:"repairCurrency"`
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	DeletedAt      gorm.DeletedAt
+}

@@ -7,6 +7,7 @@ import (
 )
 
 func TriggerFunc(db *gorm.DB) {
+	fmt.Println("Trtigger func called")
 	triggerFunc := `CREATE OR REPLACE FUNCTION update_updated_at()
 	RETURNS TRIGGER AS $$
 	BEGIN
@@ -24,8 +25,7 @@ func TriggerFunc(db *gorm.DB) {
 func TbaleTriggers(db *gorm.DB) {
 	tablesList, _ := db.Migrator().GetTables()
 
-	triggerFirstHalf := `;
-	CREATE TRIGGER set_updated_at
+	triggerFirstHalf := ` CREATE OR REPLACE TRIGGER set_updated_at
 	BEFORE UPDATE ON 
 	`
 

@@ -1,6 +1,7 @@
 package socket
 
 import (
+	"fmt"
 	"main/server/db"
 	"main/server/model"
 	"main/server/response"
@@ -10,6 +11,7 @@ import (
 )
 
 func AmountCheckSum(s socketio.Conn, req map[string]interface{}) {
+	fmt.Println("Check sum sokcet called")
 	playerId := s.Context().(string)
 	id, ok := req["id"].(string)
 	if !ok {
@@ -87,7 +89,7 @@ func AmountCheckSum(s socketio.Conn, req map[string]interface{}) {
 	case "garage":
 		{
 			var details model.Garage
-			query := "SELECT * FROM garages WHERE car_id=?"
+			query := "SELECT * FROM garages WHERE  garage_id=?"
 			err := db.QueryExecutor(query, &details, id)
 			if err != nil {
 				response.SocketResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, "checkSum", s)
@@ -103,7 +105,7 @@ func AmountCheckSum(s socketio.Conn, req map[string]interface{}) {
 	case "shop":
 		{
 			var details model.Shop
-			query := "SELECT * FROM shops WHERE car_id=?"
+			query := "SELECT * FROM shops WHERE id=?"
 			err := db.QueryExecutor(query, &details, id)
 			if err != nil {
 				response.SocketResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, "checkSum", s)

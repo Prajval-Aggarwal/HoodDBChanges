@@ -48,7 +48,7 @@ func GetPlayerDetails(s socketio.Conn, req map[string]interface{}) {
 	LEFT JOIN player_race_stats prh ON prh.player_id = p.player_id
 	LEFT JOIN player_levels pl ON pl.level = p.level + 1
 	LEFT JOIN player_levels plPrev ON plPrev.level = p.level
-	WHERE p.player_id = ? ORDER BY prh.updated_at DESC
+	WHERE p.player_id = ?
 	GROUP BY
 		p.player_id,
 		p.player_name,
@@ -65,7 +65,7 @@ func GetPlayerDetails(s socketio.Conn, req map[string]interface{}) {
 		prh.td_won,
 		prh.total_td_played,
 		pl.xp_required,
-		plPrev.xp_required
+		plPrev.xp_required,
 		prh.updated_at
 ORDER BY prh.updated_at DESC LIMIT 1;`
 	playerResponse, err := db.ResponseQuery(query, playerId, playerId)
@@ -78,7 +78,7 @@ ORDER BY prh.updated_at DESC LIMIT 1;`
 	response.SocketResponse(utils.DATA_FETCH_SUCCESS, utils.HTTP_OK, utils.SUCCESS, *playerResponse, "playerDetails", s)
 }
 
-func GetPlayerDetailsCopy(playerId string) (*response.PlayerResposne, error) {
+func GetPlayerDetailsCopy(playerId string) (*response.Success, error) {
 	// playerId := s.Context().(string)
 	fmt.Println("playerid is", playerId)
 
@@ -134,7 +134,7 @@ func GetPlayerDetailsCopy(playerId string) (*response.PlayerResposne, error) {
 		prh.td_won,
 		prh.total_td_played,
 		pl.xp_required,
-		plPrev.xp_required
+		plPrev.xp_required,
 		prh.updated_at
 ORDER BY prh.updated_at DESC LIMIT 1;`
 	playerResponse, err := db.ResponseQuery(query, playerId, playerId)
@@ -142,5 +142,11 @@ ORDER BY prh.updated_at DESC LIMIT 1;`
 		return nil, err
 	}
 
-	return playerResponse, nil
+	resp := &response.Success{
+		Status:  utils.SUCCESS,
+		Code:    utils.HTTP_OK,
+		Message: utils.DATA_FETCH_SUCCESS,
+		Data:    *playerResponse,
+	}
+	return resp, nil
 }

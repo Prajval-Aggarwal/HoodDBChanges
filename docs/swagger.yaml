@@ -97,6 +97,15 @@ definitions:
       credential:
         type: string
     type: object
+  request.ReplaceReq:
+    properties:
+      arenaId:
+        type: string
+      existingCustId:
+        type: string
+      newCustId:
+        type: string
+    type: object
   request.UpdateArenaReq:
     properties:
       arenaId:
@@ -441,6 +450,39 @@ paths:
       summary: Add a car to arena
       tags:
       - Arena
+  /arena/cars:
+    get:
+      consumes:
+      - application/json
+      description: Get the list of cars that can enter the arena
+      parameters:
+      - description: Player Access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Car added to slot successfully
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request. Invalid payload
+          schema:
+            $ref: '#/definitions/response.Success'
+        "404":
+          description: Car or player not found
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: List of cars that can play
+      tags:
+      - Arena
   /arena/end:
     post:
       consumes:
@@ -578,6 +620,83 @@ paths:
           schema:
             $ref: '#/definitions/response.Success'
       summary: Get arena owner
+      tags:
+      - Arena
+  /arena/replace-car:
+    put:
+      consumes:
+      - application/json
+      description: Add or replaces the car in the arena car slot
+      parameters:
+      - description: Player Access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Replace car Request
+        in: body
+        name: challengereq
+        required: true
+        schema:
+          $ref: '#/definitions/request.ReplaceReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "401":
+          description: Unauthorised
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Replace Car
+      tags:
+      - Arena
+  /arena/slots/get:
+    get:
+      consumes:
+      - application/json
+      description: Get the details of the cars kept in arena
+      parameters:
+      - description: Player Access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Id of the arena
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Success'
+        "401":
+          description: Unauthorised
+          schema:
+            $ref: '#/definitions/response.Success'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Get arena slots details
       tags:
       - Arena
   /arena/types:
