@@ -240,7 +240,7 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 			} else if lostCount > winCount {
 
 				//reset the arena series and empty the temp record for that player
-				query = "UPDATE player_race_stats SET win_streak=0 AND lose_streak=0 WHERE arena_id=? AND player_id=?"
+				query = "UPDATE player_race_stats SET win_streak=0 , lose_streak=0 WHERE arena_id=? AND player_id=?"
 				err = db.RawExecutor(query, endChallReq.ArenaId, playerId2)
 				if err != nil {
 					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
@@ -252,6 +252,8 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 					return
 				}
+				winCount = 0
+				lostCount = 0
 
 			}
 
@@ -468,14 +470,6 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 
 				//test it this else might create error
 
-				//create a record and set the initail win to 1
-				// arenaSeriesRecord := model.ArenaSeries{
-				// 	ArenaId:    endChallReq.ArenaId,
-				// 	PlayerId:   playerId2,
-				// 	WinStreak:  1,
-				// 	LoseStreak: 0,
-				// }
-
 				arenaSeriesRecord := model.PlayerRaceStats{
 					PlayerId:   playerId2,
 					ArenaId:    &endChallReq.ArenaId,
@@ -566,20 +560,22 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 					return
 				}
+
+			} else {
+
+				arenaSeriesRecord := model.PlayerRaceStats{
+					PlayerId:   playerId2,
+					ArenaId:    &endChallReq.ArenaId,
+					WinStreak:  0,
+					LoseStreak: 1,
+				}
+
+				err := db.CreateRecord(&arenaSeriesRecord)
+				if err != nil {
+					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+					return
+				}
 			}
-			// } else {
-			// 	arenaSeriesRecord := model.ArenaSeries{
-			// 		ArenaId:    endChallReq.ArenaId,
-			// 		PlayerId:   playerId2,
-			// 		WinStreak:  0,
-			// 		LoseStreak: 1,
-			// 	}
-			// 	err := db.CreateRecord(&arenaSeriesRecord)
-			// 	if err != nil {
-			// 		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-			// 		return
-			// 	}
-			// }
 
 			//player Lost
 			var reward model.RaceRewards
@@ -652,13 +648,6 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 
 			} else if arenaSeries.LoseStreak+arenaSeries.WinStreak == test.RaceSeries && arenaSeries.LoseStreak < arenaSeries.WinStreak {
 				fmt.Println("Player won the arena but lost the last race")
-
-				query = "UPDATE player_race_stats SET player_id=? WHERE player_id=? AND arena_id=?"
-				err = db.RawExecutor(query, playerId2, endChallReq.PlayerId1, endChallReq.ArenaId)
-				if err != nil {
-					response.ShowResponse("Unable to update the owned arena details", utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-					return
-				}
 
 				//get from temp table and update it into original table
 				var tempRecords []model.TempRaceRecords
@@ -927,14 +916,31 @@ func GetArenaOwnerService(ctx *gin.Context, arenaId string) {
 		return
 	}
 
+	var arenaClass int64
+	query := "SELECT arena_level FROM arenas WHERE arena_id=?"
+	err := db.QueryExecutor(query, &arenaClass, arenaId)
+	if err != nil {
+		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	var arenaSeries int64
+	switch arenaClass {
+	case int64(utils.EASY):
+		arenaSeries = utils.EASY_ARENA_SERIES
+	case int64(utils.MEDIUM):
+		arenaSeries = utils.MEDIUM_ARENA_SERIES
+	case int64(utils.HARD):
+		arenaSeries = utils.HARD_ARENA_SERIES
+	}
+
 	// Declare the owner model to store player race stats
 	var owner model.PlayerRaceStats
-
 	// Query to get the player with the highest win streak
-	query := "SELECT * FROM player_race_stats WHERE arena_id=? and win_streak>lose_streak ORDER BY updated_at DESC LIMIT 1"
+	query = "SELECT * FROM player_race_stats WHERE arena_id=? and win_streak>lose_streak AND win_streak+lose_streak=? ORDER BY updated_at DESC LIMIT 1"
 
 	// Execute the query and store the result in 'owner'
-	err := db.QueryExecutor(query, &owner, arenaId)
+	err = db.QueryExecutor(query, &owner, arenaId, arenaSeries)
 	if err != nil {
 		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
 		return
