@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"main/server/db"
 	"main/server/model"
+	"main/server/response"
 	"main/server/services/player"
 	"main/server/utils"
 
@@ -72,4 +73,23 @@ func roundToNearestMultipleOf5(value float64) float64 {
 // @Router /level [get]
 func GetLevelHandler(ctx *gin.Context) {
 	player.GetLevelService(ctx)
+}
+
+// @Summary Get Player Cars
+// @Description Get the lost of owned cars of the player
+// @Tags Player
+// @Produce json
+// @Param Authorization header string true "Player Access token"
+// @Success 200 {object} response.Success "Data fetched successfully"
+// @Failure 400 {object} response.Success "Bad request"
+// @Router /player/cars [get]
+func GetPlayerCarsHandler(ctx *gin.Context) {
+
+	playerId, exists := ctx.Get(utils.PLAYERID)
+	if !exists {
+		response.ShowResponse(utils.UNAUTHORIZED, utils.HTTP_UNAUTHORIZED, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	player.GetCarService(ctx, playerId.(string))
 }

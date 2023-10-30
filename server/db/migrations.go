@@ -118,7 +118,7 @@ func AutoMigrateDatabase(db *gorm.DB) {
 		dbVersion.Version = 11
 	}
 	if dbVersion.Version < 12 {
-		err := db.AutoMigrate(&model.ArenaLevelPerks{}, &model.Notifications{})
+		err := db.AutoMigrate(&model.ArenaLevelPerks{})
 		if err != nil {
 			panic(err)
 		}

@@ -60,6 +60,7 @@ func ConfigureRoutes(server *Server, socketServer *socketio.Server) {
 
 	//Player
 	server.engine.GET("/level", player.GetLevelHandler)
+	server.engine.GET("/player/cars", gateway.AdminAuthorization, player.GetPlayerCarsHandler)
 
 	//Car routes
 	server.engine.GET("/car/get-all", player.GetAllCarsHandler)

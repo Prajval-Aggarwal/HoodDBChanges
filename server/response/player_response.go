@@ -19,7 +19,7 @@ type PlayerResposne struct {
 	ShdWon           int64   `json:"showDownWon"`
 	ShdWinRatio      int64   `json:"showDownWinRatio"`
 	TdWon            int64   `json:"takeDownWon"`
-	TdWinRatio       int64   `json:"takeDownWinRatio"`
+	TdWinRatio       float64 `json:"takeDownWinRatio"`
 }
 
 type Level struct {

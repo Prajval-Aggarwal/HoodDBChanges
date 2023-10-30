@@ -1032,6 +1032,29 @@ paths:
       summary: Player Login
       tags:
       - Authentication
+  /player/cars:
+    get:
+      description: Get the lost of owned cars of the player
+      parameters:
+      - description: Player Access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data fetched successfully
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Success'
+      summary: Get Player Cars
+      tags:
+      - Player
   /reset-password:
     patch:
       consumes:

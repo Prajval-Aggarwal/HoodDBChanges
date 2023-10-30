@@ -75,6 +75,8 @@ func ColorCustomization(s socketio.Conn, req map[string]interface{}) {
 
 	if colorType == "military" {
 		switch colorId {
+		case float64(utils.MCBASIC):
+			colorName = "basic"
 		case float64(utils.MCBLACK):
 			colorName = "black"
 		case float64(utils.MCDESERT):
@@ -162,7 +164,7 @@ func ColorCustomization(s socketio.Conn, req map[string]interface{}) {
 
 	//update the color
 
-	query = "UPDATE player_car_customizations SET color_name=? ,color_category=?, color_type=? WHERE player_id=? AND cust_id=? "
+	query = "UPDATE player_car_customisations SET color_name=? ,color_category=?, color_type=? WHERE player_id=? AND cust_id=? "
 	err = tx.Exec(query, colorName, colorCategory, colorType, playerId, custId).Error
 	if err != nil {
 		tx.Rollback()
@@ -237,7 +239,7 @@ func WheelCustomize(s socketio.Conn, req map[string]interface{}) {
 	}
 
 	var exists bool
-	query := "SELECT EXISTS(SELECT * FROM player_car_customizations WHERE wheel_category=? AND wheel_color_name=? AND cust_id=? and player_id=?)"
+	query := "SELECT EXISTS(SELECT * FROM player_car_customisations WHERE wheel_category=? AND wheel_color_name=? AND cust_id=? and player_id=?)"
 	err := db.QueryExecutor(query, &exists, wheelCategory, colorName, custId, playerId)
 	if err != nil {
 		response.SocketResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, "colorCustomise", s)
@@ -311,7 +313,7 @@ func WheelCustomize(s socketio.Conn, req map[string]interface{}) {
 
 	//update the wheel color with proper subcateory
 
-	query = "UPDATE player_car_customizations SET wheel_color_name=?, wheel_category=? WHERE player_id=? AND cust_id=?"
+	query = "UPDATE player_car_customisations SET wheel_color_name=?, wheel_category=? WHERE player_id=? AND cust_id=?"
 	err = tx.Exec(query, colorName, wheelCategory, playerId, custId).Error
 	if err != nil {
 		tx.Rollback()
@@ -446,7 +448,7 @@ func InteriorCustomize(s socketio.Conn, req map[string]interface{}) {
 	}
 
 	//query to update interior color
-	query = "UPDATE player_car_customizations SET interior_color_name=? WHERE player_id=? AND cust_id=?"
+	query = "UPDATE player_car_customisations SET interior_color_name=? WHERE player_id=? AND cust_id=?"
 
 	err = db.RawExecutor(query, colorName, playerId, custId)
 	if err != nil {

@@ -117,18 +117,21 @@ func AmountCheckSum(s socketio.Conn, req map[string]interface{}) {
 				{
 					if details.PurchaseValue > playerDetails.Coins {
 						response.SocketResponse(utils.NOT_ENOUGH_COINS, utils.HTTP_BAD_REQUEST, utils.FAILURE, req, "checkSum", s)
+						return
 					}
 				}
 			case utils.CASH:
 				{
 					if details.PurchaseValue > playerDetails.Cash {
 						response.SocketResponse(utils.NOT_ENOUGH_CASH, utils.HTTP_BAD_REQUEST, utils.FAILURE, req, "checkSum", s)
+						return
 					}
 				}
 			case utils.REPAIR_PARTS:
 				{
 					if details.PurchaseValue > playerDetails.RepairCurrency {
 						response.SocketResponse(utils.NOT_ENOUGH_REPAIR_PARTS, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "checkSum", s)
+						return
 					}
 				}
 			}

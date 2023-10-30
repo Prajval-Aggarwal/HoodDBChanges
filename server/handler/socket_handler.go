@@ -49,4 +49,7 @@ func SocketHandler(server *socketio.Server) {
 	//store connection
 	server.OnEvent("/", "buyStore", gateway.SocketAuthMiddleware(shop.BuyFromShop))
 
+	//reward socket
+	server.OnEvent("/", "close", gateway.SocketAuthMiddleware(socket.Close))
+
 }

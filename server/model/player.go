@@ -78,18 +78,20 @@ type PlayerCarCustomisation struct {
 }
 
 type PlayerRaceStats struct {
-	Id               string  `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
-	PlayerId         string  `json:"playerId,omitempty"`
-	Player           Player  `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
-	ArenaId          *string `json:"arenaId,omitempty"`
-	Arena            Arena   `json:"-" gorm:"references:ArenaId;constraint:OnDelete:CASCADE"`
-	WinStreak        int64   `json:"winStreak"`
-	LoseStreak       int64   `json:"loseStreak"`
-	DistanceTraveled float64 `json:"distanceTraveled"`
-	ShdWon           int64   `json:"showDownWon"`
-	TotalShdPlayed   int64   `json:"totalShdPlayed"`
-	TdWon            int64   `json:"takeDownWon"`
-	TotalTdPlayed    int64   `json:"totalTdPlayed"`
+	Id               string    `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
+	PlayerId         string    `json:"playerId,omitempty"`
+	Player           Player    `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
+	ArenaId          *string   `json:"arenaId,omitempty"`
+	Arena            Arena     `json:"-" gorm:"references:ArenaId;constraint:OnDelete:CASCADE"`
+	WinStreak        int64     `json:"winStreak"`
+	LoseStreak       int64     `json:"loseStreak"`
+	DistanceTraveled float64   `json:"distanceTraveled"`
+	ShdWon           int64     `json:"showDownWon"`
+	TotalShdPlayed   int64     `json:"totalShdPlayed"`
+	TdWon            int64     `json:"takeDownWon"`
+	TotalTdPlayed    int64     `json:"totalTdPlayed"`
+	WinTime          time.Time `json:"winTime"`
+	ArenaWon         bool      `json:"arenaWon"`
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
 	DeletedAt        gorm.DeletedAt

@@ -12,6 +12,7 @@ require (
 	github.com/googollee/go-socket.io v1.7.0
 	github.com/joho/godotenv v1.3.0
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/stretchr/testify v1.8.2 // indirect
 	github.com/stripe/stripe-go/v72 v72.122.0
 	github.com/swaggo/files v1.0.1

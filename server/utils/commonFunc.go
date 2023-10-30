@@ -72,7 +72,6 @@ func HashPassword(password string) (*string, error) {
 }
 
 func SetCarData(carId string, playerId string) error {
-	fmt.Println("asdabsdbjashbdjbsakjdbk")
 	var carDefaults model.DefaultCustomisation
 	query := "SELECT * FROM default_customisations WHERE car_id=? "
 	err := db.QueryExecutor(query, &carDefaults, carId)
@@ -99,23 +98,16 @@ func SetCarData(carId string, playerId string) error {
 		InteriorColorName: carDefaults.InteriorColorName,
 		LPValue:           carDefaults.LPValue,
 	}
-	fmt.Println("playesdfsdr", playerCarCustomisations)
 	err = db.CreateRecord(&playerCarCustomisations)
-	fmt.Println("err", err)
 	if err != nil {
-		fmt.Println("error ", err)
 		return err
-	} else {
-		fmt.Println("hellooo")
 	}
-	fmt.Println("player", playerCarCustomisations)
 
 	newCarRecord := model.OwnedCars{
 		PlayerId: playerId,
 		CustId:   playerCarCustomisations.CustId,
 		Selected: true,
 	}
-	fmt.Println("car", newCarRecord)
 
 	err = db.CreateRecord(&newCarRecord)
 	if err != nil {
@@ -171,62 +163,6 @@ func SendEmaillService(adminDetails model.Admin, link string) error {
 	}
 	return nil
 }
-
-// func UpgradeData(playerId string, carId string) (*model.Player, *model.PlayerCarsStats, *model.PlayerCarUpgrades, string, int64, *model.RatingMulti, error) {
-// 	var playerDetails model.Player
-// 	var playerCarStats model.PlayerCarsStats
-// 	var carClassDetails string
-
-// 	var playerCarUpgrades model.PlayerCarUpgrades
-// 	var maxUpgradeLevel int64
-// 	var classRating model.RatingMulti
-// 	//check if the car is owned or not
-// 	var exists bool
-// 	query := "SELECT EXISTS(SELECT * FROM owned_cars WHERE player_id =? AND car_id=?)"
-// 	err := db.QueryExecutor(query, &exists, playerId, carId)
-// 	if err != nil {
-// 		return nil, nil, nil, "", 0, nil, err
-// 	}
-// 	if !exists {
-// 		return nil, nil, nil, "", 0, nil, errors.New(NOT_FOUND)
-// 	}
-// 	err = db.FindById(&playerDetails, playerId, PLAYER_ID)
-// 	if err != nil {
-// 		return nil, nil, nil, "", 0, nil, err
-// 	}
-
-// 	query = "SELECT * FROM player_cars_stats WHERE player_id=? AND car_id=?"
-// 	err = db.QueryExecutor(query, &playerCarStats, playerId, carId)
-// 	if err != nil {
-// 		return nil, nil, nil, "", 0, nil, err
-// 	}
-
-// 	query = "SELECT class FROM cars WHERE car_id=?"
-// 	err = db.QueryExecutor(query, &carClassDetails, carId)
-// 	if err != nil {
-// 		return nil, nil, nil, "", 0, nil, err
-// 	}
-
-// 	query = "SELECT * FROM rating_multis WHERE class=?"
-// 	err = db.QueryExecutor(query, &classRating, carClassDetails)
-// 	if err != nil {
-// 		return nil, nil, nil, "", 0, nil, err
-// 	}
-
-// 	query = "SELECT * FROM player_car_upgrades WHERE player_id=? AND car_id=?"
-// 	err = db.QueryExecutor(query, &playerCarUpgrades, playerId, carId)
-// 	if err != nil {
-// 		return nil, nil, nil, "", 0, nil, err
-// 	}
-
-// 	query = "SELECT upgrade_level FROM upgrades WHERE class =? ORDER BY upgrade_level DESC LIMIT 1;"
-// 	err = db.QueryExecutor(query, &maxUpgradeLevel, carClassDetails)
-// 	if err != nil {
-// 		return nil, nil, nil, "", 0, nil, err
-// 	}
-
-// 	return &playerDetails, &playerCarStats, &playerCarUpgrades, carClassDetails, maxUpgradeLevel, &classRating, nil
-// }
 
 func RoundFloat(val float64, precision uint) float64 {
 	ratio := math.Pow(10, float64(precision))
@@ -348,7 +284,7 @@ func CustomiseMapping(id string, tableName string) (*response.Customization, err
 		respCustomise.ColorType = 2
 	case "pastel":
 		respCustomise.ColorType = 3
-	case "gun_metal":
+	case "gun_Metal":
 		respCustomise.ColorType = 4
 	case "satin":
 		respCustomise.ColorType = 5
@@ -369,6 +305,21 @@ func CustomiseMapping(id string, tableName string) (*response.Customization, err
 		respCustomise.ColorName = 4
 	case "blue":
 		respCustomise.ColorName = 5
+	}
+
+	if carCustomise.ColorType == "military" {
+		switch carCustomise.ColorName {
+		case "basic":
+			respCustomise.ColorName = 1
+		case "black":
+			respCustomise.ColorName = 2
+		case "desert":
+			respCustomise.ColorName = 3
+		case "tram":
+			respCustomise.ColorName = 4
+		case "ucp":
+			respCustomise.ColorName = 5
+		}
 	}
 
 	switch carCustomise.WheelColorName {

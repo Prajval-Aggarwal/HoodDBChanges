@@ -7,6 +7,7 @@ import (
 	"main/server/model"
 	"main/server/request"
 	"main/server/response"
+	"main/server/services/socket"
 	"main/server/utils"
 	"strconv"
 	"strings"
@@ -279,10 +280,12 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 				return
 			}
 			if exists {
+				//tx := db.BeginTransaction()
 				//increment the number of wins
 				query := "UPDATE player_race_stats SET win_streak=win_streak+1 WHERE  arena_id=? AND player_id=?"
 				err := db.RawExecutor(query, endChallReq.ArenaId, playerId2)
 				if err != nil {
+					//tx.Rollback()
 					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 					return
 				}
@@ -292,6 +295,7 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 				query = "SELECT * FROM player_race_stats WHERE arena_id=? AND player_id=?"
 				err = db.QueryExecutor(query, &arenaSeries, endChallReq.ArenaId, playerId2)
 				if err != nil {
+					//tx.Rollback()
 					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 					return
 				}
@@ -301,6 +305,7 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 				query = "SELECT * FROM race_types WHERE race_level=? AND race_name='arena'"
 				err = db.QueryExecutor(query, &test, arenaDetails.ArenaLevel)
 				if err != nil {
+					//tx.Rollback()
 					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 					return
 				}
@@ -313,7 +318,7 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 					//as reward1 donot contain xp so playerLevel field is omoited here
 					totalRewards, err := BuildArenaRewardResponse(test, ctx, playerId2, endChallReq, "win")
 					if err != nil {
-
+						//tx.Rollback()
 						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 						return
 					}
@@ -327,6 +332,7 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 					}
 					err = db.CreateRecord(&tempRecord)
 					if err != nil {
+						//tx.Rollback()
 						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 						return
 					}
@@ -375,9 +381,55 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 						return
 					}
 
+					query = "UPDATE player_race_stats SET win_time=?,arena_won=? WHERE arena_id=? AND player_id=?"
+					err = db.RawExecutor(query, time.Now(), "true", endChallReq.ArenaId, playerId2)
+					if err != nil {
+						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+						return
+					}
+
+					query = "UPDATE player_race_stats SET arena_won=? WHERE arena_id=? AND player_id=?"
+					err = db.RawExecutor(query, "false", endChallReq.ArenaId, endChallReq.PlayerId1)
+					if err != nil {
+						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+						return
+					}
+
 					err = UpdatePlayerRaceHistory(playerId2, ctx, endChallReq, true)
 					if err != nil {
 						response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+						return
+					}
+
+					newRecord := model.ArenaReward{
+						ArenaId:        endChallReq.ArenaId,
+						PlayerId:       playerId2,
+						Coins:          0,
+						Cash:           0,
+						RepairCurrency: 0,
+						RewardTime:     time.Now(),
+					}
+
+					switch int64(arenaDetails.ArenaLevel) {
+					case int64(utils.EASY):
+						newRecord.NextRewardTime = time.Now().Add(time.Duration(utils.EASY_PERK_MINUTES) * time.Minute)
+					case int64(utils.MEDIUM):
+						newRecord.NextRewardTime = time.Now().Add(time.Duration(utils.MEDIUM_PERK_MINUTES) * time.Minute)
+					case int64(utils.HARD):
+						newRecord.NextRewardTime = time.Now().Add(time.Duration(utils.HARD_PERK_MINUTES) * time.Minute)
+
+					}
+
+					err = db.CreateRecord(&newRecord)
+					if err != nil {
+						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+						return
+					}
+
+					query := "DELETE FROM arena_rewards WHERE player_id=? AND arena_id=?"
+					err = db.RawExecutor(query, endChallReq.PlayerId1, endChallReq.ArenaId)
+					if err != nil {
+						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 						return
 					}
 
@@ -390,21 +442,76 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 					//it should be 24 hours
 
 				} else if (arenaSeries.WinStreak+arenaSeries.LoseStreak) == test.RaceSeries && (arenaSeries.WinStreak < arenaSeries.LoseStreak) {
+					// sdfsfsdfsdf
 					//player lost the arena so give arena lost reward
-					fmt.Println("Lost the arena")
+					fmt.Println("Lost the arena but won the race")
 
-					totalRewards, err := BuildArenaRewardResponse(test, ctx, playerId2, endChallReq, "lost")
-					if err != nil {
+					var reward model.RaceRewards
+					var totalRewards = []response.RewardResponse{}
 
-						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-						return
-					}
 					err = UpdatePlayerRaceHistory(playerId2, ctx, endChallReq, true)
 					if err != nil {
 						response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
 						return
 					}
-					response.ShowResponse(utils.LOSE, utils.HTTP_OK, utils.SUCCESS, totalRewards, ctx)
+
+					//this is the takedown reward fetch
+					query = "SELECT * FROM race_rewards WHERE race_id=? AND status=?"
+					err = db.QueryExecutor(query, &reward, endChallReq.RaceId, "win")
+					if err != nil {
+						response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+						return
+					}
+
+					playerLevel, err := EarnedRewards(playerId2, ctx, reward)
+					if err != nil {
+						response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+						return
+					}
+
+					if playerLevel != nil {
+
+						totalRewards = append(totalRewards, response.RewardResponse{
+							RewardName: "level",
+							RewardData: response.RewardData{
+								Coins:      playerLevel.Coins,
+								Level:      playerLevel.Level,
+								XPRequired: playerLevel.XPRequired,
+							},
+						})
+					}
+
+					totalRewards = append(totalRewards, response.RewardResponse{
+						RewardName: raceType.RaceName,
+						RewardData: response.RewardData{
+							Coins:          reward.Coins,
+							Cash:           reward.Cash,
+							RepairCurrency: reward.RepairCurrency,
+							XPGained:       reward.XPGained,
+							Status:         "win",
+						},
+					})
+
+					var reward1 model.RaceRewards
+					query := "SELECT * FROM race_rewards WHERE race_id=? AND status='lost'"
+					err = db.QueryExecutor(query, &reward1, test.RaceId)
+					if err != nil {
+						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+						return
+					}
+
+					totalRewards = append(totalRewards, response.RewardResponse{
+						RewardName: "arena",
+						RewardData: response.RewardData{
+							Coins:          reward1.Coins,
+							Cash:           reward1.Cash,
+							RepairCurrency: reward1.RepairCurrency,
+							XPGained:       reward1.XPGained,
+							Status:         reward1.Status,
+						},
+					})
+
+					response.ShowResponse(utils.WON, utils.HTTP_OK, utils.SUCCESS, totalRewards, ctx)
 				} else {
 
 					//player won the challenge but not the arena
@@ -907,6 +1014,18 @@ func EarnedRewards(playerId string, ctx *gin.Context, rewards model.RaceRewards)
 		return nil, err
 	}
 
+	playerResponse, err := socket.GetPlayerDetailsCopy(playerId)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("Player Response", *playerResponse)
+	//braodcasting the updated player details to the front end
+
+	if !utils.SocketServerInstance.BroadcastToRoom("/", playerId, "playerDetails", *playerResponse) {
+		return nil, err
+	}
+
 	return nil, nil
 }
 func GetArenaOwnerService(ctx *gin.Context, arenaId string) {
@@ -1057,20 +1176,43 @@ func GetArenaOwnerService(ctx *gin.Context, arenaId string) {
 }
 
 func EnterArenaService(ctx *gin.Context, enterReq request.GetArenaReq, playerId string) {
-	// Check if the arena is already owned by the player
-	var exists bool
-	query := "SELECT EXISTS (SELECT 1 FROM player_race_stats WHERE arena_id = ? AND player_id = ? AND win_streak > lose_streak)"
-	err := db.QueryExecutor(query, &exists, enterReq.ArenaId, playerId)
+
+	var arenaLevel int64
+	query := "SELECT arena_level FROM arenas WHERE arena_id=?"
+	err := db.QueryExecutor(query, &arenaLevel, enterReq.ArenaId)
 	if err != nil {
 		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 		return
 	}
 
-	// If the player already owns the arena, show an error response
-	if exists {
+	var arenaSeries int64
+	switch arenaLevel {
+	case int64(utils.EASY):
+		arenaSeries = utils.EASY_ARENA_SERIES
+	case int64(utils.MEDIUM):
+		arenaSeries = utils.MEDIUM_ARENA_SERIES
+	case int64(utils.HARD):
+		arenaSeries = utils.HARD_ARENA_SERIES
+	}
+
+	// Check if the arena is already owned by the player
+	var arenaOwnedplayerId string
+	query = `SELECT player_id FROM player_race_stats 
+	WHERE arena_id = ?
+	AND win_streak > lose_streak 
+	AND win_streak+lose_streak=? ORDER BY updated_at DESC LIMIT 1`
+
+	err = db.QueryExecutor(query, &arenaOwnedplayerId, enterReq.ArenaId, arenaSeries)
+	if err != nil {
+		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+		return
+	}
+	if playerId == arenaOwnedplayerId {
 		response.ShowResponse(utils.ARENA_ALREADY_OWNED, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
 		return
 	}
+
+	var exists bool
 
 	// Check if the player has any previous records in the arena
 	query = "SELECT EXISTS (SELECT 1 FROM player_race_stats WHERE arena_id = ? AND player_id = ?)"
@@ -1101,113 +1243,6 @@ func EnterArenaService(ctx *gin.Context, enterReq request.GetArenaReq, playerId 
 
 	// Show a success response if all checks and updates are completed
 	response.ShowResponse("Successfully", utils.HTTP_OK, utils.SUCCESS, nil, ctx)
-}
-
-func AddCarToSlotService(ctx *gin.Context, addCarReq request.AddCarArenaRequest, playerId string) {
-
-	// Check if the car is bought by the player
-	query := "SELECT EXISTS(SELECT * FROM owned_cars WHERE player_id = ? AND cust_id = ?)"
-	if !utils.IsExisting(query, playerId, addCarReq.CustId) {
-		response.ShowResponse(utils.CAR_NOT_OWNED, utils.HTTP_NOT_FOUND, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	// Check if the player owns the arena
-	query = "SELECT EXISTS(SELECT * FROM player_race_stats WHERE player_id = ? AND arena_id = ?)"
-	if !utils.IsExisting(query, playerId, addCarReq.ArenaId) {
-		response.ShowResponse(utils.ARENA_NOT_OWNED, utils.HTTP_NOT_FOUND, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	// Check that it should not add more cars than required slots for the arena
-	var arenaDetails model.Arena
-	err := db.FindById(&arenaDetails, addCarReq.ArenaId, "arena_id")
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	//check that if the car is already alloted to another arena or not
-	query = "SELECT EXISTS (SELECT * FROM arena_cars WHERE player_id = ? AND cust_id=?)"
-	if utils.IsExisting(query, playerId, addCarReq.CustId) {
-		response.ShowResponse(utils.CAR_ALREADY_ALLOTTED, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	var carCount int64
-	query = "SELECT COUNT(*) FROM arena_cars WHERE player_id = ? AND arena_id = ?"
-	err = db.QueryExecutor(query, &carCount, playerId, addCarReq.ArenaId)
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	// Check the slot limit for the arena level and ensure it's not exceeded
-	var maxSlots int64
-	switch arenaDetails.ArenaLevel {
-	case int64(utils.EASY):
-		maxSlots = utils.EASY_ARENA_SLOT
-	case int64(utils.MEDIUM):
-		maxSlots = utils.MEDIUM_ARENA_SLOT
-	case int64(utils.HARD):
-		maxSlots = utils.HARD_ARENA_SLOT
-	default:
-		response.ShowResponse("Invalid arena level", utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	if carCount == maxSlots {
-		response.ShowResponse(utils.NO_CARS_ADDED, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	// Create a record in the car_slots table
-	carSlot := model.ArenaCars{
-		PlayerId: playerId,
-		ArenaId:  addCarReq.ArenaId,
-		CustId:   addCarReq.CustId,
-	}
-
-	err = db.CreateRecord(&carSlot)
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	response.ShowResponse(utils.CAR_ADDED_SUCCESS, utils.HTTP_OK, utils.SUCCESS, carSlot, ctx)
-}
-
-func ReplaceCarService(ctx *gin.Context, replaceReq request.ReplaceReq, playerId string) {
-	// Check if the car is bought by the player and owned by the player
-	query := "SELECT EXISTS(SELECT * FROM owned_cars WHERE player_id = ? AND cust_id = ?)"
-	if !utils.IsExisting(query, playerId, replaceReq.NewCustId) {
-		response.ShowResponse(utils.CAR_NOT_OWNED, utils.HTTP_NOT_FOUND, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	// Check if the player owns the arena
-	query = "SELECT EXISTS(SELECT * FROM player_race_stats WHERE player_id = ? AND arena_id = ?)"
-	if !utils.IsExisting(query, playerId, replaceReq.ArenaId) {
-		response.ShowResponse(utils.ARENA_NOT_OWNED, utils.HTTP_NOT_FOUND, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	//check that if the car is already alloted to another arena or not
-	query = "SELECT EXISTS (SELECT * FROM arena_cars WHERE player_id = ? AND cust_id=?)"
-	if utils.IsExisting(query, playerId, replaceReq.ExistingCustId) {
-		response.ShowResponse(utils.CAR_ALREADY_ALLOTTED, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	// Replace the car in the slot
-	query = "UPDATE arena_cars SET cust_id = ? WHERE player_id = ? AND arena_id = ? AND cust_id="
-	err := db.RawExecutor(query, replaceReq.NewCustId, playerId, replaceReq.ArenaId, replaceReq.ExistingCustId)
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	response.ShowResponse(utils.CAR_REPLACED_SUCCESS, utils.HTTP_OK, utils.SUCCESS, replaceReq, ctx)
 }
 
 func ArenaCarService(ctx *gin.Context, playerId string) {
@@ -1251,80 +1286,5 @@ func ArenaCarService(ctx *gin.Context, playerId string) {
 	}
 
 	response.ShowResponse(utils.DATA_FETCH_SUCCESS, utils.HTTP_OK, utils.SUCCESS, res, ctx)
-
-}
-
-func GetArenaSlotDetailsService(ctx *gin.Context, playerId string, arenaId string) {
-	var arenaSlotData response.ArenaSlotResponse
-
-	//check if the areana is owned by the player or not
-
-	var arenaRewardDetails model.ArenaLevelPerks
-	query := "select ap.* from arena_level_perks ap JOIN arenas a ON a.arena_level=ap.arena_level WHERE a.arena_id=?;"
-	err := db.QueryExecutor(query, &arenaRewardDetails, arenaId)
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	arenaSlotData.RewardData = arenaRewardDetails
-	if arenaRewardDetails.ArenaLevel == int64(utils.EASY) {
-		arenaSlotData.TotalSlots = int(utils.EASY_ARENA_SLOT)
-	} else if arenaRewardDetails.ArenaLevel == int64(utils.MEDIUM) {
-		arenaSlotData.TotalSlots = int(utils.MEDIUM_ARENA_SLOT)
-	} else if arenaRewardDetails.ArenaLevel == int64(utils.HARD) {
-		arenaSlotData.TotalSlots = int(utils.HARD_ARENA_SLOT)
-	}
-
-	var arenaWinTime time.Time
-	query = "SELECT win_time FROM owned_battle_arenas WHERE arena_id=?"
-	err = db.QueryExecutor(query, &arenaWinTime, arenaId)
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	temp := time.Since(arenaWinTime.Add(24 * time.Hour))
-	arenaSlotData.ArenaWinTime = temp.Abs().String()
-
-	var res []response.CarRes
-
-	var carStruct2 []response.CarCustom
-	query = `SELECT pcc.*,c.class,c.car_name
-        FROM player_car_customisations pcc
-        JOIN cars c ON c.car_id=pcc.car_id 
-        JOIN arena_cars arr ON arr.cust_id=pcc.cust_id
-        WHERE arr.arena_id=? AND arr.player_id=?;`
-
-	// Execute the query and store the result in 'carStruct2'
-	err = db.QueryExecutor(query, &carStruct2, arenaId, playerId)
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	for _, details := range carStruct2 {
-		record := &response.CarRes{
-			CustId:  details.CustId,
-			CarId:   details.CarId,
-			CarName: details.CarName,
-			Rarity:  details.Class,
-		}
-
-		carCustomise, _ := utils.CustomiseMapping(details.CustId, "player_car_customisations")
-		record.CarCurrentData.Customization = *carCustomise
-		record.CarCurrentData.Stats.Power = details.Power
-		record.CarCurrentData.Stats.Grip = details.Grip
-		record.CarCurrentData.Stats.Weight = details.Weight
-		record.CarCurrentData.Stats.ShiftTime = details.ShiftTime
-		record.CarCurrentData.Stats.OVR = details.OVR
-		record.CarCurrentData.Stats.Durability = details.Durability
-		record.Status.Owned = true
-
-		res = append(res, *record)
-	}
-	arenaSlotData.CarDetails = res
-
-	response.ShowResponse(utils.DATA_FETCH_SUCCESS, utils.HTTP_OK, utils.SUCCESS, arenaSlotData, ctx)
 
 }

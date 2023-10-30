@@ -40,3 +40,43 @@ func GetLevelService(ctx *gin.Context) {
 	response.ShowResponse(utils.DATA_FETCH_SUCCESS, utils.HTTP_OK, utils.SUCCESS, res, ctx)
 
 }
+
+func GetCarService(ctx *gin.Context, playerId string) {
+
+	var playerCar []response.CarCustom
+	query := `SELECT pcc.*,c.car_name,c.class 
+	FROM player_car_customisations pcc 
+	JOIN cars c ON c.car_id=pcc.car_id 
+	WHERE player_id=?`
+	err := db.QueryExecutor(query, &playerCar, playerId)
+	if err != nil {
+		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+		return
+	}
+	var resp []response.CarRes
+	for _, car := range playerCar {
+		temp := &response.CarRes{
+			CustId:  car.CustId,
+			CarId:   car.CarId,
+			CarName: car.CarName,
+			Rarity:  car.Class,
+		}
+		temp.CarCurrentData.Stats.Grip = car.Grip
+		temp.CarCurrentData.Stats.Weight = car.Weight
+		temp.CarCurrentData.Stats.Power = car.Power
+		temp.CarCurrentData.Stats.ShiftTime = car.ShiftTime
+		temp.CarCurrentData.Stats.OVR = car.OVR
+		temp.CarCurrentData.Stats.Durability = car.Durability
+
+		carCustomise, _ := utils.CustomiseMapping(car.CustId, "player_car_customisations")
+
+		temp.CarCurrentData.Customization = *carCustomise
+		temp.Status.Owned = true
+		temp.Status.Purchasable = false
+
+		resp = append(resp, *temp)
+
+	}
+
+	response.ShowResponse(utils.DATA_FETCH_SUCCESS, utils.HTTP_OK, utils.SUCCESS, resp, ctx)
+}

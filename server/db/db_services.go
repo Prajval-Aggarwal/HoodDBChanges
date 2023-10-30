@@ -18,8 +18,6 @@ func BeginTransaction() *gorm.DB {
 }
 
 func CreateRecord(data interface{}) error {
-
-	fmt.Println("inside db create record")
 	err := db.Create(data).Error
 	if err != nil {
 		// fmt.Println("gorm error is", gorm.ErrDuplicatedKey.Error())

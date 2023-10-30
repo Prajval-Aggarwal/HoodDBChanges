@@ -67,6 +67,7 @@ func AddArenaService(ctx *gin.Context, addArenaReq request.AddArenaRequest) {
 	aiOwnedArena := model.PlayerRaceStats{
 		PlayerId: AIId,
 		ArenaId:  &newArena.ArenaId,
+		WinTime:  time.Now(),
 	}
 	if newArena.ArenaLevel == int64(utils.EASY) {
 		aiOwnedArena.WinStreak = utils.EASY_ARENA_SERIES
@@ -272,7 +273,7 @@ func GetAllArenaService(ctx *gin.Context) {
 		return
 	}
 	dataresp.TotalCount = totalCount
-	dataresp.Data = ArenaList
+	dataresp.Data = arenaResponseList
 
 	response.ShowResponse(utils.DATA_FETCH_SUCCESS, utils.HTTP_OK, utils.SUCCESS, dataresp, ctx)
 }
