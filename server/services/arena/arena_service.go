@@ -309,8 +309,10 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 					return
 				}
-				fmt.Println("test is:", test)
-				fmt.Println("arena series", arenaSeries)
+				fmt.Printf("test is%+v", test)
+				fmt.Println("")
+				fmt.Printf("arena series%+v", arenaSeries)
+				fmt.Println("")
 				if (arenaSeries.WinStreak+arenaSeries.LoseStreak) == test.RaceSeries && (arenaSeries.WinStreak > arenaSeries.LoseStreak) {
 					//player won the arena
 					fmt.Println("wining the arena")
@@ -346,7 +348,8 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 						return
 					}
 
-					fmt.Println("TempRecords are", tempRecords)
+					fmt.Printf("TempRecords are%+v", tempRecords)
+					fmt.Println()
 
 					//update is not working so first deleteing those reords and then add new records
 
@@ -395,12 +398,6 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 						return
 					}
 
-					err = UpdatePlayerRaceHistory(playerId2, ctx, endChallReq, true)
-					if err != nil {
-						response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-						return
-					}
-
 					newRecord := model.ArenaReward{
 						ArenaId:        endChallReq.ArenaId,
 						PlayerId:       playerId2,
@@ -433,6 +430,11 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 						return
 					}
 
+					err = UpdatePlayerRaceHistory(playerId2, ctx, endChallReq, true)
+					if err != nil {
+						response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+						return
+					}
 					//give both rewards arena and takedown
 					response.ShowResponse(utils.WON, utils.HTTP_OK, utils.SUCCESS, totalRewards, ctx)
 
@@ -818,6 +820,52 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 						Status:         reward1.Status,
 					},
 				})
+
+				query = "UPDATE player_race_stats SET win_time=?,arena_won=? WHERE arena_id=? AND player_id=?"
+				err = db.RawExecutor(query, time.Now(), "true", endChallReq.ArenaId, playerId2)
+				if err != nil {
+					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+					return
+				}
+
+				query = "UPDATE player_race_stats SET arena_won=? WHERE arena_id=? AND player_id=?"
+				err = db.RawExecutor(query, "false", endChallReq.ArenaId, endChallReq.PlayerId1)
+				if err != nil {
+					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+					return
+				}
+
+				newRecord := model.ArenaReward{
+					ArenaId:        endChallReq.ArenaId,
+					PlayerId:       playerId2,
+					Coins:          0,
+					Cash:           0,
+					RepairCurrency: 0,
+					RewardTime:     time.Now(),
+				}
+
+				switch int64(arenaDetails.ArenaLevel) {
+				case int64(utils.EASY):
+					newRecord.NextRewardTime = time.Now().Add(time.Duration(utils.EASY_PERK_MINUTES) * time.Minute)
+				case int64(utils.MEDIUM):
+					newRecord.NextRewardTime = time.Now().Add(time.Duration(utils.MEDIUM_PERK_MINUTES) * time.Minute)
+				case int64(utils.HARD):
+					newRecord.NextRewardTime = time.Now().Add(time.Duration(utils.HARD_PERK_MINUTES) * time.Minute)
+
+				}
+
+				err = db.CreateRecord(&newRecord)
+				if err != nil {
+					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+					return
+				}
+
+				query = "DELETE FROM arena_rewards WHERE player_id=? AND arena_id=?"
+				err = db.RawExecutor(query, endChallReq.PlayerId1, endChallReq.ArenaId)
+				if err != nil {
+					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+					return
+				}
 			}
 
 			if playerLevel != nil {
@@ -842,6 +890,8 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 					Status:         reward.Status,
 				},
 			})
+			// 525
+
 			err = UpdatePlayerRaceHistory(playerId2, ctx, endChallReq, false)
 			if err != nil {
 				response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
@@ -849,6 +899,12 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 			}
 			response.ShowResponse(utils.LOSE, utils.HTTP_OK, utils.SUCCESS, totalRewards, ctx)
 		}
+
+		playerResponse, _ := socket.GetPlayerDetailsCopy(playerId2)
+		utils.SocketServerInstance.BroadcastToRoom("/", playerId2, "playerDetails", *playerResponse)
+
+		playerResponse, _ = socket.GetPlayerDetailsCopy(endChallReq.PlayerId1)
+		utils.SocketServerInstance.BroadcastToRoom("/", endChallReq.PlayerId1, "playerDetails", *playerResponse)
 
 	}
 
@@ -1014,18 +1070,6 @@ func EarnedRewards(playerId string, ctx *gin.Context, rewards model.RaceRewards)
 		return nil, err
 	}
 
-	playerResponse, err := socket.GetPlayerDetailsCopy(playerId)
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Println("Player Response", *playerResponse)
-	//braodcasting the updated player details to the front end
-
-	if !utils.SocketServerInstance.BroadcastToRoom("/", playerId, "playerDetails", *playerResponse) {
-		return nil, err
-	}
-
 	return nil, nil
 }
 func GetArenaOwnerService(ctx *gin.Context, arenaId string) {
@@ -1056,7 +1100,7 @@ func GetArenaOwnerService(ctx *gin.Context, arenaId string) {
 	// Declare the owner model to store player race stats
 	var owner model.PlayerRaceStats
 	// Query to get the player with the highest win streak
-	query = "SELECT * FROM player_race_stats WHERE arena_id=? and win_streak>lose_streak AND win_streak+lose_streak=? ORDER BY updated_at DESC LIMIT 1"
+	query = "SELECT * FROM player_race_stats WHERE arena_id=? and win_streak>lose_streak AND win_streak+lose_streak=? AND arena_won='true' ORDER BY updated_at DESC LIMIT 1"
 
 	// Execute the query and store the result in 'owner'
 	err = db.QueryExecutor(query, &owner, arenaId, arenaSeries)
@@ -1139,7 +1183,7 @@ func GetArenaOwnerService(ctx *gin.Context, arenaId string) {
         FROM player_car_customisations pcc
         JOIN cars c ON c.car_id=pcc.car_id 
         JOIN arena_race_records arr ON arr.cust_id=pcc.cust_id
-        WHERE arr.arena_id=? AND arr.player_id=?;`
+        WHERE arr.arena_id=? AND arr.player_id=? ORDER BY arr.created_at;`
 
 	// Execute the query and store the result in 'carStruct2'
 	err = db.QueryExecutor(query, &carStruct2, arenaId, playerDetails.PlayerId)

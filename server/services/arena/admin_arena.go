@@ -68,6 +68,7 @@ func AddArenaService(ctx *gin.Context, addArenaReq request.AddArenaRequest) {
 		PlayerId: AIId,
 		ArenaId:  &newArena.ArenaId,
 		WinTime:  time.Now(),
+		ArenaWon: true,
 	}
 	if newArena.ArenaLevel == int64(utils.EASY) {
 		aiOwnedArena.WinStreak = utils.EASY_ARENA_SERIES

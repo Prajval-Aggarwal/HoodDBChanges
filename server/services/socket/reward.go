@@ -14,19 +14,20 @@ import (
 func GiveArenaPerks2(server *socketio.Server) {
 
 	var tempRes []struct {
-		PlayerId   string
-		ArenaId    string
-		ArenaLevel int64
+		PlayerId       string
+		ArenaId        string
+		NextRewardTime time.Time
+		ArenaLevel     int64
 	}
 	query := `SELECT ar.player_id,ar.arena_id,a.level FROM arena_rewards  JOIN arenas a ON ar.arena_id=a.arena_id WHERE next_reward_time= CURRENT_TIMESTAMP`
+
+	// query = "SELECT ar.*,a.level FROM arena_rewards  JOIN arenas a ON ar.arena_id= a.arena_id WHERE next_reward_time= CURRENT_TIMESTAMP"
 
 	err := db.QueryExecutor(query, &tempRes)
 	if err != nil {
 		fmt.Println("Error is:", err.Error())
 		return
 	}
-
-	fmt.Println("Temp record are:", tempRes)
 
 	if len(tempRes) != 0 {
 		for _, temp := range tempRes {
@@ -50,12 +51,19 @@ func GiveArenaPerks2(server *socketio.Server) {
 				fmt.Println("Error is:", err.Error())
 				return
 			}
-			query = "UPDATE arena_cars SET coins=coins+?,cash=cash+?,repair_parts=repair_parts+?,reward_time=? and next_reward_time=? WHERE arena_id=? AND player_id=?"
-			err = db.QueryExecutor(query, &arenaPerks.Coins, &arenaPerks.Cash, &arenaPerks.RepairParts, time.Now(), nextTime, temp.ArenaId, temp.PlayerId)
+			var arenaRewards model.ArenaReward
+			query = "SELECT * FROM arena_reward WHERE arena_id=? AND player_id=?"
+			err = db.QueryExecutor(query, &arenaRewards, temp.ArenaId, temp.PlayerId)
 			if err != nil {
-				fmt.Println("Error in updating the existing arena reward")
+				fmt.Println("Error in fetching from arena reward")
 				return
 			}
+
+			arenaRewards.Coins += arenaPerks.Coins
+			arenaRewards.Cash += arenaPerks.Cash
+			arenaRewards.RepairCurrency += arenaPerks.RepairParts
+			arenaRewards.RewardTime = time.Now()
+			arenaRewards.NextRewardTime = nextTime
 
 			playerDetails, _ := utils.GetPlayerDetails(temp.PlayerId)
 
@@ -69,6 +77,7 @@ func GiveArenaPerks2(server *socketio.Server) {
 				return
 			}
 
+			utils.SocketServerInstance.BroadcastToRoom("/", playerDetails.PlayerId, "reward", arenaRewards)
 		}
 	} else {
 		fmt.Println("No on owns the arena")
@@ -96,5 +105,26 @@ func Close(s socketio.Conn, req map[string]interface{}) {
 	}
 
 	response.SocketResponse(utils.SUCCESS, utils.HTTP_OK, utils.SUCCESS, nil, "close", s)
+
+}
+
+func Open(s socketio.Conn, req map[string]interface{}) {
+	playerId := s.Context().(string)
+
+	arenaId, ok := req["arenaId"].(string)
+	if !ok {
+		response.SocketResponse("Arena id required", utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "open", s)
+		return
+	}
+
+	var arenaReward model.ArenaReward
+	query := "SELECT * FROM arena_rewards WHERE arena_id=? AND player_id=?"
+	err := db.QueryExecutor(query, &arenaReward, arenaId, playerId)
+	if err != nil {
+		response.SocketResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, "open", s)
+		return
+	}
+
+	response.SocketResponse(utils.DATA_FETCH_SUCCESS, utils.HTTP_OK, utils.SUCCESS, arenaReward, "open", s)
 
 }

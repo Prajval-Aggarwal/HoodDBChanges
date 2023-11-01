@@ -56,32 +56,31 @@ func BuyCarService(s socketio.Conn, req map[string]interface{}) {
 		buyType = "cash"
 	}
 
-	var amount int64
-
-	// Check if the player has enough currency to buy the car.
-
-	if carDetails.CurrType == "coins" {
-		amount = playerDetails.Coins
-	} else {
-		amount = playerDetails.Cash
-	}
-
-	if amount < int64(carDetails.CurrAmount) {
-		response.SocketResponse(utils.NOT_ENOUGH_COINS, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "carBuy", s)
-		return
-	}
-
 	// Start a database transaction to handle the purchase.
 
 	if buyType == carDetails.CurrType {
 		if carDetails.CurrType == "coins" {
-			playerDetails.Coins -= int64(carDetails.CurrAmount)
+			if carDetails.CurrAmount > float64(playerDetails.Coins) {
+				response.SocketResponse(utils.NOT_ENOUGH_COINS, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "carBuy", s)
+				return
+			} else {
+				playerDetails.Coins -= int64(carDetails.CurrAmount)
+			}
 		} else {
-			playerDetails.Cash -= int64(carDetails.CurrAmount)
+			if carDetails.CurrAmount > float64(playerDetails.Cash) {
+				response.SocketResponse(utils.NOT_ENOUGH_CASH, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "carBuy", s)
+				return
+			} else {
+				playerDetails.Cash -= int64(carDetails.CurrAmount)
+			}
 		}
 	} else {
-		playerDetails.Cash -= int64(carDetails.PremiumBuy)
-
+		if float64(carDetails.PremiumBuy) > float64(playerDetails.Cash) {
+			response.SocketResponse(utils.NOT_ENOUGH_CASH, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "carBuy", s)
+			return
+		} else {
+			playerDetails.Cash -= int64(carDetails.PremiumBuy)
+		}
 	}
 	fmt.Println("Player details is", playerDetails)
 

@@ -67,6 +67,8 @@ GROUP BY
 `
 
 func GetPlayerDetails(s socketio.Conn, req map[string]interface{}) {
+
+	fmt.Println("Player details socket called")
 	playerId := s.Context().(string)
 	fmt.Println("playerid is", playerId)
 

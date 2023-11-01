@@ -117,10 +117,10 @@ func SetCarData(carId string, playerId string) error {
 	return nil
 }
 
-func IsCarBought(playerId string, carId string) bool {
+func IsCarBought(playerId string, custId string) bool {
 	var exists bool
-	query := "SELECT EXISTS(SELECT * FROM owned_cars WHERE player_id =? AND car_id=?)"
-	err := db.QueryExecutor(query, &exists, playerId, carId)
+	query := "SELECT EXISTS(SELECT * FROM owned_cars WHERE player_id =? AND cust_id=?)"
+	err := db.QueryExecutor(query, &exists, playerId, custId)
 	if err != nil {
 		return false
 	}

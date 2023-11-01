@@ -20,7 +20,7 @@ type ArenaResponse struct {
 type ArenaSlotResponse struct {
 	RewardData    model.ArenaLevelPerks `json:"rewardData"`
 	ArenaWinTime  string                `json:"slotAddTime"`
-	ArenaPerkTime time.Time             `json:"rewardTime"`
+	ArenaPerkTime string                `json:"rewardTime"`
 	TotalSlots    int                   `json:"totalSlots"`
 	CarDetails    []CarRes              `json:"carDetails"`
 }

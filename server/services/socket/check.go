@@ -68,18 +68,7 @@ func AmountCheckSum(s socketio.Conn, req map[string]interface{}) {
 					}
 				}
 			} else {
-				if details.CurrAmount > float64(playerDetails.Cash) {
-					response.SocketResponse(utils.NOT_ENOUGH_CASH, utils.HTTP_BAD_REQUEST, utils.FAILURE, req, "checkSum", s)
-					return
-				}
-			}
-			if details.CurrType == "coins" {
-				if details.CurrAmount > float64(playerDetails.Coins) {
-					response.SocketResponse(utils.NOT_ENOUGH_COINS, utils.HTTP_BAD_REQUEST, utils.FAILURE, req, "checkSum", s)
-					return
-				}
-			} else if details.CurrType == "cash" {
-				if details.CurrAmount > float64(playerDetails.Cash) {
+				if float64(details.PremiumBuy) > float64(playerDetails.Cash) {
 					response.SocketResponse(utils.NOT_ENOUGH_CASH, utils.HTTP_BAD_REQUEST, utils.FAILURE, req, "checkSum", s)
 					return
 				}

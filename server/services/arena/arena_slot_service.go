@@ -1,6 +1,7 @@
 package arena
 
 import (
+	"fmt"
 	"main/server/db"
 	"main/server/model"
 	"main/server/request"
@@ -33,6 +34,7 @@ func GetArenaSlotDetailsService(ctx *gin.Context, playerId string, arenaId strin
 		arenaSlotData.TotalSlots = int(utils.HARD_ARENA_SLOT)
 	}
 
+	//get the time left for slots to fill
 	var arenaWinTime time.Time
 	query = "SELECT win_time FROM player_race_stats WHERE arena_id=? and player_id=? order by updated_at DESC LIMIT 1"
 	err = db.QueryExecutor(query, &arenaWinTime, arenaId, playerId)
@@ -41,8 +43,22 @@ func GetArenaSlotDetailsService(ctx *gin.Context, playerId string, arenaId strin
 		return
 	}
 
-	temp := time.Since(arenaWinTime.Add(24 * time.Hour))
-	arenaSlotData.ArenaWinTime = temp.Abs().String()
+	temp := time.Until(arenaWinTime.Add(24 * time.Hour))
+	// temp := arenaWinTime.Add(24 * time.Hour).Sub(time.Now())
+	arenaSlotData.ArenaWinTime = temp.String()
+
+	//get the next arena perk time
+	var arenaPerkTime time.Time
+	query = "SELECT next_reward_time FROM arena_rewards WHERE arena_id=? AND player_id=?"
+	err = db.QueryExecutor(query, &arenaPerkTime, arenaId, playerId)
+	if err != nil {
+		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+		return
+	}
+
+	temp1 := arenaPerkTime.Sub(time.Now())
+	fmt.Println("arena perk time is", temp1)
+	arenaSlotData.ArenaPerkTime = temp1.String()
 
 	var res []response.CarRes
 

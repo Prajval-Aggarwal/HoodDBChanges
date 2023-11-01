@@ -36,6 +36,10 @@ func ColorCustomization(s socketio.Conn, req map[string]interface{}) {
 		return
 	}
 
+	if !utils.IsCarBought(playerId, custId) {
+		response.SocketResponse(utils.BUY_CAR_ERROR, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "wheelCustomise", s)
+		return
+	}
 	var colorType string
 	switch int64(colorTypeId) {
 	case int64(utils.FLUORESCENT):
@@ -358,6 +362,10 @@ func InteriorCustomize(s socketio.Conn, req map[string]interface{}) {
 		response.SocketResponse("color id is required", utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "interiorCustomise", s)
 		return
 	}
+	if !utils.IsCarBought(playerId, custId) {
+		response.SocketResponse(utils.BUY_CAR_ERROR, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "wheelCustomise", s)
+		return
+	}
 
 	var colorName string
 	switch colorId {
@@ -495,11 +503,21 @@ func LicenseCustomize(s socketio.Conn, req map[string]interface{}) {
 		return
 	}
 
+	if len(value) > 8 {
+		response.SocketResponse("Value should be max 8 characters", utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "licenseCustomise", s)
+		return
+	}
+
+	if !utils.IsCarBought(playerId, custId) {
+		response.SocketResponse(utils.BUY_CAR_ERROR, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "wheelCustomise", s)
+		return
+	}
 	playerDetails, err := utils.GetPlayerDetails(playerId)
 	if err != nil {
 		response.SocketResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, "licenseCustomise", s)
 		return
 	}
+
 	var exists bool
 
 	query := "SELECT EXISTS(SELECT * FROM player_car_customisations where cust_id=? and lp_value=? and player_id=?)"

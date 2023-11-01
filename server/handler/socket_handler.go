@@ -13,7 +13,7 @@ import (
 func SocketHandler(server *socketio.Server) {
 	server.OnConnect("/", func(s socketio.Conn) error {
 		fmt.Println("connected:", s.ID())
-		fmt.Println("Connecting host is:", s.URL().Host)
+		fmt.Println()
 		return nil
 	})
 
@@ -50,6 +50,7 @@ func SocketHandler(server *socketio.Server) {
 	server.OnEvent("/", "buyStore", gateway.SocketAuthMiddleware(shop.BuyFromShop))
 
 	//reward socket
+	server.OnEvent("/", "reward", gateway.SocketAuthMiddleware(socket.Open))
 	server.OnEvent("/", "close", gateway.SocketAuthMiddleware(socket.Close))
 
 }

@@ -1,6 +1,7 @@
 package shop
 
 import (
+	"fmt"
 	"main/server/db"
 	"main/server/model"
 	"main/server/response"
@@ -12,6 +13,7 @@ import (
 
 func BuyFromShop(s socketio.Conn, reqData map[string]interface{}) {
 
+	fmt.Println("Bur form shop socket called")
 	playerId := s.Context().(string)
 	buyId, ok := reqData["id"].(string)
 	if !ok {

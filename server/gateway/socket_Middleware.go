@@ -5,14 +5,18 @@ import (
 	"main/server/response"
 	"main/server/services/token"
 	"main/server/utils"
+	"strings"
 
 	socketio "github.com/googollee/go-socket.io"
 )
 
 func SocketAuthMiddleware(next func(s socketio.Conn, reqData map[string]interface{})) func(socketio.Conn, map[string]interface{}) {
 	return func(s socketio.Conn, reqData map[string]interface{}) {
-		tokenString := s.RemoteHeader().Get(utils.Authorization)
-		//fmt.Println("Token is", tokenString)
+		// fmt.Println("query is ", s.URL().RawQuery)
+		tokenString := strings.Split(strings.Split(s.URL().RawQuery, "&")[0], "=")[1]
+		// tokenString := s.RemoteHeader().Get(utils.Authorization)
+		// fmt.Println("Token is", tokenString)
+
 		var exists bool
 		//first check if the session is valid or not
 		query := "SELECT EXISTS(SELECT 1 FROM sessions WHERE token=?)"
