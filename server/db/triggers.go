@@ -34,7 +34,7 @@ func TbaleTriggers(db *gorm.DB) {
 
 	for _, table := range tablesList {
 		trigger := triggerFirstHalf + table + triggerSecondHalf
-		fmt.Println("Triger query is", trigger)
+		//fmt.Println("Triger query is", trigger)
 		err := db.Exec(trigger).Error
 		if err != nil {
 			fmt.Println("Error is:", err)

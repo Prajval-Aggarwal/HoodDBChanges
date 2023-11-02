@@ -351,31 +351,40 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 					fmt.Printf("TempRecords are%+v", tempRecords)
 					fmt.Println()
 
-					//update is not working so first deleteing those reords and then add new records
-
-					query = "DELETE FROM  arena_race_records  WHERE player_id=? AND arena_id=?"
-					err = db.RawExecutor(query, endChallReq.PlayerId1, endChallReq.ArenaId)
-					if err != nil {
-						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-						return
-					}
-
 					for _, rec := range tempRecords {
-
-						newRecord := model.ArenaRaceRecord{
-							PlayerId: playerId2,
-							ArenaId:  endChallReq.ArenaId,
-							TimeWin:  rec.TimeWin,
-							Result:   rec.Result,
-							CustId:   rec.CustId,
-						}
-
-						err = db.CreateRecord(&newRecord)
+						query = "UPDATE arena_race_records SET player_id=? ,time_win=?,result=?,cust_id=? WHERE player_id=? AND arena_id=?"
+						err = db.RawExecutor(query, playerId2, rec.TimeWin, rec.Result, rec.CustId, endChallReq.PlayerId1, endChallReq.ArenaId)
 						if err != nil {
 							response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 							return
 						}
 					}
+
+					//update is not working so first deleteing those reords and then add new records
+
+					// query = "DELETE FROM  arena_race_records  WHERE player_id=? AND arena_id=?"
+					// err = db.RawExecutor(query, endChallReq.PlayerId1, endChallReq.ArenaId)
+					// if err != nil {
+					// 	response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+					// 	return
+					// }
+
+					// for _, rec := range tempRecords {
+
+					// 	newRecord := model.ArenaRaceRecord{
+					// 		PlayerId: playerId2,
+					// 		ArenaId:  endChallReq.ArenaId,
+					// 		TimeWin:  rec.TimeWin,
+					// 		Result:   rec.Result,
+					// 		CustId:   rec.CustId,
+					// 	}
+
+					// 	err = db.CreateRecord(&newRecord)
+					// 	if err != nil {
+					// 		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+					// 		return
+					// 	}
+					// }
 
 					query = "DELETE FROM  temp_race_records  WHERE player_id=? AND arena_id=?"
 					err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
@@ -384,47 +393,7 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 						return
 					}
 
-					query = "UPDATE player_race_stats SET win_time=?,arena_won=? WHERE arena_id=? AND player_id=?"
-					err = db.RawExecutor(query, time.Now(), "true", endChallReq.ArenaId, playerId2)
-					if err != nil {
-						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-						return
-					}
-
-					query = "UPDATE player_race_stats SET arena_won=? WHERE arena_id=? AND player_id=?"
-					err = db.RawExecutor(query, "false", endChallReq.ArenaId, endChallReq.PlayerId1)
-					if err != nil {
-						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-						return
-					}
-
-					newRecord := model.ArenaReward{
-						ArenaId:        endChallReq.ArenaId,
-						PlayerId:       playerId2,
-						Coins:          0,
-						Cash:           0,
-						RepairCurrency: 0,
-						RewardTime:     time.Now(),
-					}
-
-					switch int64(arenaDetails.ArenaLevel) {
-					case int64(utils.EASY):
-						newRecord.NextRewardTime = time.Now().Add(time.Duration(utils.EASY_PERK_MINUTES) * time.Minute)
-					case int64(utils.MEDIUM):
-						newRecord.NextRewardTime = time.Now().Add(time.Duration(utils.MEDIUM_PERK_MINUTES) * time.Minute)
-					case int64(utils.HARD):
-						newRecord.NextRewardTime = time.Now().Add(time.Duration(utils.HARD_PERK_MINUTES) * time.Minute)
-
-					}
-
-					err = db.CreateRecord(&newRecord)
-					if err != nil {
-						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-						return
-					}
-
-					query := "DELETE FROM arena_rewards WHERE player_id=? AND arena_id=?"
-					err = db.RawExecutor(query, endChallReq.PlayerId1, endChallReq.ArenaId)
+					err = UpdateArenaOwnedData(endChallReq, playerId2, ctx, arenaDetails)
 					if err != nil {
 						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 						return
@@ -438,10 +407,60 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 					//give both rewards arena and takedown
 					response.ShowResponse(utils.WON, utils.HTTP_OK, utils.SUCCESS, totalRewards, ctx)
 
-					//add a 24 hour timer after the arena is won
-					///if after the 24 hour there is no entery in carSlots table then the arebna will be given back to the AI
-
 					//it should be 24 hours
+					time.AfterFunc(30*time.Minute, func() {
+
+						fmt.Println("time is:", time.Now())
+						count := 0
+						query := "SELECT COUNT(*) FROM arena_cars WHERE player_id=? AND arena_id=?"
+						err = db.QueryExecutor(query, &count, playerId2, endChallReq.ArenaId)
+						if err != nil {
+							response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+							return
+						}
+						var requiredSlots int64
+
+						switch arenaDetails.ArenaLevel {
+						case int64(utils.EASY):
+							requiredSlots = utils.EASY_ARENA_SLOT
+						case int64(utils.MEDIUM):
+							requiredSlots = utils.MEDIUM_ARENA_SLOT
+						case int64(utils.HARD):
+							requiredSlots = utils.HARD_ARENA_SLOT
+						}
+
+						if count != int(requiredSlots) {
+							// give the arena back to AI
+
+							query = "DELETE FROM arena_rewards WHERE player_id=? AND arena_id=?"
+							err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
+							if err != nil {
+								response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+								return
+							}
+
+							query = "DELETE FROM arena_race_records WHERE player_id=? AND arena_id=?"
+							err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
+							if err != nil {
+								response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+								return
+							}
+
+							query = "UPDATE player_race_stats SET arena_won=false WHERE player_id=? AND arena_id=?"
+							err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
+							if err != nil {
+								response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+								return
+							}
+
+							err = utils.GiveArenaToAi(endChallReq.ArenaId, arenaDetails.ArenaLevel)
+							if err != nil {
+								response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+								return
+							}
+
+						}
+					})
 
 				} else if (arenaSeries.WinStreak+arenaSeries.LoseStreak) == test.RaceSeries && (arenaSeries.WinStreak < arenaSeries.LoseStreak) {
 					// sdfsfsdfsdf
@@ -769,31 +788,40 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 
 				fmt.Println("TempRecords are", tempRecords)
 
-				//update is not working so first deleteing those reords and then add new records
-
-				query = "DELETE FROM  arena_race_records  WHERE player_id=? AND arena_id=?"
-				err = db.RawExecutor(query, endChallReq.PlayerId1, endChallReq.ArenaId)
-				if err != nil {
-					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-					return
-				}
-
 				for _, rec := range tempRecords {
-
-					newRecord := model.ArenaRaceRecord{
-						PlayerId: playerId2,
-						ArenaId:  endChallReq.ArenaId,
-						TimeWin:  rec.TimeWin,
-						Result:   rec.Result,
-						CustId:   rec.CustId,
-					}
-
-					err = db.CreateRecord(&newRecord)
+					query = "UPDATE arena_race_records SET player_id=? ,time_win=?,result=?,cust_id=? WHERE player_id=? AND arena_id=?"
+					err = db.RawExecutor(query, playerId2, rec.TimeWin, rec.Result, rec.CustId, endChallReq.PlayerId1, endChallReq.ArenaId)
 					if err != nil {
 						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 						return
 					}
 				}
+
+				//update is not working so first deleteing those reords and then add new records
+
+				// query = "DELETE FROM  arena_race_records  WHERE player_id=? AND arena_id=?"
+				// err = db.RawExecutor(query, endChallReq.PlayerId1, endChallReq.ArenaId)
+				// if err != nil {
+				// 	response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+				// 	return
+				// }
+
+				// for _, rec := range tempRecords {
+
+				// 	newRecord := model.ArenaRaceRecord{
+				// 		PlayerId: playerId2,
+				// 		ArenaId:  endChallReq.ArenaId,
+				// 		TimeWin:  rec.TimeWin,
+				// 		Result:   rec.Result,
+				// 		CustId:   rec.CustId,
+				// 	}
+
+				// 	err = db.CreateRecord(&newRecord)
+				// 	if err != nil {
+				// 		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+				// 		return
+				// 	}
+				// }
 				query = "DELETE FROM  temp_race_records  WHERE player_id=? AND arena_id=?"
 				err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
 				if err != nil {
@@ -821,51 +849,12 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 					},
 				})
 
-				query = "UPDATE player_race_stats SET win_time=?,arena_won=? WHERE arena_id=? AND player_id=?"
-				err = db.RawExecutor(query, time.Now(), "true", endChallReq.ArenaId, playerId2)
+				err = UpdateArenaOwnedData(endChallReq, playerId2, ctx, arenaDetails)
 				if err != nil {
 					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 					return
 				}
 
-				query = "UPDATE player_race_stats SET arena_won=? WHERE arena_id=? AND player_id=?"
-				err = db.RawExecutor(query, "false", endChallReq.ArenaId, endChallReq.PlayerId1)
-				if err != nil {
-					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-					return
-				}
-
-				newRecord := model.ArenaReward{
-					ArenaId:        endChallReq.ArenaId,
-					PlayerId:       playerId2,
-					Coins:          0,
-					Cash:           0,
-					RepairCurrency: 0,
-					RewardTime:     time.Now(),
-				}
-
-				switch int64(arenaDetails.ArenaLevel) {
-				case int64(utils.EASY):
-					newRecord.NextRewardTime = time.Now().Add(time.Duration(utils.EASY_PERK_MINUTES) * time.Minute)
-				case int64(utils.MEDIUM):
-					newRecord.NextRewardTime = time.Now().Add(time.Duration(utils.MEDIUM_PERK_MINUTES) * time.Minute)
-				case int64(utils.HARD):
-					newRecord.NextRewardTime = time.Now().Add(time.Duration(utils.HARD_PERK_MINUTES) * time.Minute)
-
-				}
-
-				err = db.CreateRecord(&newRecord)
-				if err != nil {
-					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-					return
-				}
-
-				query = "DELETE FROM arena_rewards WHERE player_id=? AND arena_id=?"
-				err = db.RawExecutor(query, endChallReq.PlayerId1, endChallReq.ArenaId)
-				if err != nil {
-					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-					return
-				}
 			}
 
 			if playerLevel != nil {
@@ -898,6 +887,62 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 				return
 			}
 			response.ShowResponse(utils.LOSE, utils.HTTP_OK, utils.SUCCESS, totalRewards, ctx)
+
+			time.AfterFunc(30*time.Minute, func() {
+
+				fmt.Println("time is:", time.Now())
+				count := 0
+				query := "SELECT COUNT(*) FROM arena_cars WHERE player_id=? AND arena_id=?"
+				err = db.QueryExecutor(query, &count, playerId2, endChallReq.ArenaId)
+				if err != nil {
+					response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+					return
+				}
+				var requiredSlots int64
+
+				switch arenaDetails.ArenaLevel {
+				case int64(utils.EASY):
+					requiredSlots = utils.EASY_ARENA_SLOT
+				case int64(utils.MEDIUM):
+					requiredSlots = utils.MEDIUM_ARENA_SLOT
+				case int64(utils.HARD):
+					requiredSlots = utils.HARD_ARENA_SLOT
+				}
+
+				if count != int(requiredSlots) {
+					// give the arena back to AI
+
+					query = "DELETE FROM arena_rewards WHERE player_id=? AND arena_id=?"
+					err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
+					if err != nil {
+						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+						return
+					}
+
+					query = "DELETE FROM arena_race_records WHERE player_id=? AND arena_id=?"
+					err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
+					if err != nil {
+						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+						return
+					}
+
+					query = "UPDATE player_race_stats SET arena_won=false WHERE player_id=? AND arena_id=?"
+					err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
+					if err != nil {
+						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+						return
+					}
+
+					err = utils.GiveArenaToAi(endChallReq.ArenaId, arenaDetails.ArenaLevel)
+					if err != nil {
+						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+						return
+					}
+
+				} else {
+					fmt.Println("Player has filled all the slot")
+				}
+			})
 		}
 
 		playerResponse, _ := socket.GetPlayerDetailsCopy(playerId2)
@@ -909,169 +954,7 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 	}
 
 }
-func BuildArenaRewardResponse(test model.RaceTypes, ctx *gin.Context, playerId2 string, endChallReq request.EndChallengeReq, status string) ([]response.RewardResponse, error) {
-	var reward1, reward2 model.RaceRewards
-	query := "SELECT * FROM race_rewards WHERE race_id=? AND status=?"
-	err := db.QueryExecutor(query, &reward1, test.RaceId, status)
-	if err != nil {
-		return nil, err
-	}
 
-	_, err = EarnedRewards(playerId2, ctx, reward1)
-	if err != nil {
-		return nil, err
-	}
-
-	err = db.QueryExecutor(query, &reward2, endChallReq.RaceId, status)
-	if err != nil {
-		return nil, err
-	}
-
-	playerLevel, err := EarnedRewards(playerId2, ctx, reward2)
-	if err != nil {
-		return nil, err
-	}
-	var totalRewards = []response.RewardResponse{}
-
-	if playerLevel != nil {
-
-		totalRewards = append(totalRewards, response.RewardResponse{
-			RewardName: "level",
-			RewardData: response.RewardData{
-				Coins:      playerLevel.Coins,
-				Level:      playerLevel.Level,
-				XPRequired: playerLevel.XPRequired,
-			},
-		})
-	}
-
-	totalRewards = append(totalRewards, response.RewardResponse{
-		RewardName: "arena",
-		RewardData: response.RewardData{
-			Coins:          reward1.Coins,
-			Cash:           reward1.Cash,
-			RepairCurrency: reward1.RepairCurrency,
-			XPGained:       reward1.XPGained,
-			Status:         reward1.Status,
-		},
-	})
-
-	totalRewards = append(totalRewards, response.RewardResponse{
-		RewardName: "takedowns",
-		RewardData: response.RewardData{
-			Coins:          reward2.Coins,
-			Cash:           reward2.Cash,
-			RepairCurrency: reward2.RepairCurrency,
-			XPGained:       reward2.XPGained,
-			Status:         reward2.Status,
-		},
-	})
-	return totalRewards, nil
-}
-func UpdatePlayerRaceHistory(playerId string, ctx *gin.Context, endChallReq request.EndChallengeReq, win bool) error {
-
-	//get player race history
-	var playerRaceHistory model.PlayerRaceStats
-	err := db.FindById(&playerRaceHistory, playerId, utils.PLAYER_ID)
-	if err != nil {
-		return err
-	}
-
-	//get the details of the race type
-	var raceType model.RaceTypes
-	err = db.FindById(&raceType, endChallReq.RaceId, "race_id")
-	if err != nil {
-		return err
-	}
-
-	//update the details
-	playerRaceHistory.DistanceTraveled += raceType.RaceLength
-	if raceType.RaceName == "showdowns" {
-		playerRaceHistory.TotalShdPlayed += 1
-		if win {
-			playerRaceHistory.ShdWon += 1
-		}
-	}
-	if raceType.RaceName == "takedowns" {
-		playerRaceHistory.TotalTdPlayed += 1
-		if win {
-			playerRaceHistory.TdWon += 1
-		}
-	}
-
-	err = db.UpdateRecord(&playerRaceHistory, playerId, utils.PLAYER_ID).Error
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func UpgradePlayerLevel(newXp int64, playerDetails *model.Player) (*model.PlayerLevel, bool, error) {
-	currentLevel := playerDetails.Level
-	var playerLevel model.PlayerLevel
-	query := "SELECT * FROM player_levels WHERE level=?"
-	err := db.QueryExecutor(query, &playerLevel, currentLevel+1)
-	if err != nil {
-		return nil, false, err
-	}
-
-	//give player level upgrade reward
-	if newXp >= playerLevel.XPRequired {
-		// Update player level
-		playerDetails.Level++
-		playerDetails.Coins += playerLevel.Coins
-
-		return &playerLevel, true, nil
-	}
-
-	// fmt.Println("player Details is:", playerDetails)
-
-	return nil, false, nil
-}
-
-func EarnedRewards(playerId string, ctx *gin.Context, rewards model.RaceRewards) (*model.PlayerLevel, error) {
-
-	//get player details
-
-	playerDetails, err := utils.GetPlayerDetails(playerId)
-	if err != nil {
-		return nil, err
-	}
-	//begin transaction
-	tx := db.BeginTransaction()
-	if tx.Error != nil {
-		return nil, err
-	}
-
-	playerDetails.Coins += rewards.Coins
-	playerDetails.Cash += rewards.Cash
-	playerDetails.RepairCurrency += rewards.RepairCurrency
-	playerDetails.XP += rewards.XPGained
-
-	playerLevel, isUpgraded, err := UpgradePlayerLevel(playerDetails.XP, playerDetails)
-	if err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-	//fmt.Println("player levele is ", playerLevel)
-
-	err = db.UpdateRecord(&playerDetails, playerId, utils.PLAYER_ID).Error
-	if err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-
-	if isUpgraded {
-		// Handle player level upgrade logic, if needed
-		return playerLevel, nil
-	}
-
-	if err = tx.Commit().Error; err != nil {
-		return nil, err
-	}
-
-	return nil, nil
-}
 func GetArenaOwnerService(ctx *gin.Context, arenaId string) {
 	// Check if the arena exists in the database
 	if !db.RecordExist("arenas", arenaId, "arena_id") {
@@ -1244,7 +1127,7 @@ func EnterArenaService(ctx *gin.Context, enterReq request.GetArenaReq, playerId 
 	query = `SELECT player_id FROM player_race_stats 
 	WHERE arena_id = ?
 	AND win_streak > lose_streak 
-	AND win_streak+lose_streak=? ORDER BY updated_at DESC LIMIT 1`
+	AND win_streak+lose_streak=?  AND arena_won=true ORDER BY updated_at DESC LIMIT 1`
 
 	err = db.QueryExecutor(query, &arenaOwnedplayerId, enterReq.ArenaId, arenaSeries)
 	if err != nil {
@@ -1257,7 +1140,6 @@ func EnterArenaService(ctx *gin.Context, enterReq request.GetArenaReq, playerId 
 	}
 
 	var exists bool
-
 	// Check if the player has any previous records in the arena
 	query = "SELECT EXISTS (SELECT 1 FROM player_race_stats WHERE arena_id = ? AND player_id = ?)"
 	err = db.QueryExecutor(query, &exists, enterReq.ArenaId, playerId)

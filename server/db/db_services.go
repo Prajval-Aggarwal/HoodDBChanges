@@ -88,7 +88,7 @@ func ResponseQuery(query string, args ...interface{}) (*response.PlayerResposne,
 	playerResposne := &response.PlayerResposne{}
 	row := db.Raw(query, args...).Row()
 
-	err := row.Scan(&playerResposne.PlayerId, &playerResposne.PlayerName, &playerResposne.Level, &playerResposne.XP, &playerResposne.Role, &playerResposne.Email, &playerResposne.Coins, &playerResposne.Cash, &playerResposne.RepairParts, &playerResposne.CarsOwned, &playerResposne.GaragesOwned, &playerResposne.ArenasOwned, &playerResposne.DistanceTraveled, &playerResposne.XPRequired, &playerResposne.PrevXP, &playerResposne.ShdWon, &playerResposne.ShdWinRatio, &playerResposne.TdWon, &playerResposne.TdWinRatio)
+	err := row.Scan(&playerResposne.PlayerId, &playerResposne.PlayerName, &playerResposne.Level, &playerResposne.XP, &playerResposne.Role, &playerResposne.Email, &playerResposne.Coins, &playerResposne.Cash, &playerResposne.RepairParts, &playerResposne.CarsOwned, &playerResposne.GaragesOwned, &playerResposne.ArenasOwned, &playerResposne.XPRequired, &playerResposne.PrevXP, &playerResposne.ShdWon, &playerResposne.ShdWinRatio, &playerResposne.TdWon, &playerResposne.TdWinRatio)
 
 	//fmt.Printf("Player detials are%#v", playerResposne)
 	if err != nil {

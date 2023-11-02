@@ -84,9 +84,13 @@ const (
 	MEDIUM_PERK string = "@every 3h"
 	HARD_PERK   string = "@every 7h"
 
-	EASY_PERK_MINUTES   int = 30
-	MEDIUM_PERK_MINUTES int = 180
-	HARD_PERK_MINUTES   int = 420
+	// EASY_PERK_MINUTES   int = 30
+	// MEDIUM_PERK_MINUTES int = 180
+	// HARD_PERK_MINUTES   int = 420
+
+	EASY_PERK_MINUTES   int = 2
+	MEDIUM_PERK_MINUTES int = 10
+	HARD_PERK_MINUTES   int = 15
 
 	EASY_ARENA_SLOT   int64 = 3
 	MEDIUM_ARENA_SLOT int64 = 5

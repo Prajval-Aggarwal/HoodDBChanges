@@ -18,6 +18,7 @@ func StartCron(server *socketio.Server) {
 	//Run cron at every minute
 	//check the next reward time is same as current time. If yes give the rewards
 	c.AddFunc("*/1 * * * *", func() {
+		fmt.Println(".....................Cron hit..................................")
 		socket.GiveArenaPerks2(server)
 	})
 

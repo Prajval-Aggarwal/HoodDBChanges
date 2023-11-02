@@ -1,24 +1,17 @@
 package arena
 
 import (
-	"errors"
 	"fmt"
 	"main/server/db"
 	"main/server/model"
 	"main/server/request"
 	"main/server/response"
 	"main/server/utils"
-	"sort"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
-
-type carDetails struct {
-	CustId string
-	OVR    float64
-}
 
 func AddArenaService(ctx *gin.Context, addArenaReq request.AddArenaRequest) {
 	//	var newArena model.Arena
@@ -51,78 +44,11 @@ func AddArenaService(ctx *gin.Context, addArenaReq request.AddArenaRequest) {
 
 	//add the arena to the owned arena list of the AI
 
-	var AIId string
-	query = "SELECT player_id FROM players WHERE role='ai' order by RANDOM() LIMIT 1;"
-	err = db.QueryExecutor(query, &AIId)
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-		return
-	}
-
-	// aiOwnedArena := model.OwnedBattleArenas{
-	// 	ArenaId:  newArena.ArenaId,
-	// 	PlayerId: AIId,
-	// }
-
-	aiOwnedArena := model.PlayerRaceStats{
-		PlayerId: AIId,
-		ArenaId:  &newArena.ArenaId,
-		WinTime:  time.Now(),
-		ArenaWon: true,
-	}
-	if newArena.ArenaLevel == int64(utils.EASY) {
-		aiOwnedArena.WinStreak = utils.EASY_ARENA_SERIES
-	} else if newArena.ArenaLevel == int64(utils.MEDIUM) {
-		aiOwnedArena.WinStreak = utils.MEDIUM_ARENA_SERIES
-	} else if newArena.ArenaLevel == int64(utils.HARD) {
-		aiOwnedArena.WinStreak = utils.HARD_ARENA_SERIES
-	}
-
-	err = db.CreateRecord(&aiOwnedArena)
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-		return
-	}
-
 	//add the win records for that arena
-	var randomTimeSlice []string
-	var carSlice []carDetails
-
-	if addArenaReq.ArenaLevel == int64(utils.EASY) {
-		randomTimeSlice = utils.GenerateRandomTime(int(utils.EASY_ARENA_SLOT), 22.0, 25.0)
-		carSlice, err = GiveRandomCar(aiOwnedArena.PlayerId, newArena.ArenaId, 1, 2, int(utils.EASY_ARENA_SLOT))
-		if err != nil {
-			return
-		}
-	} else if addArenaReq.ArenaLevel == int64(utils.MEDIUM) {
-		randomTimeSlice = utils.GenerateRandomTime(int(utils.MEDIUM_ARENA_SLOT), 22.0, 25.0)
-		carSlice, err = GiveRandomCar(aiOwnedArena.PlayerId, newArena.ArenaId, 2, 4, int(utils.MEDIUM_ARENA_SLOT))
-		if err != nil {
-			return
-		}
-
-	} else if addArenaReq.ArenaLevel == int64(utils.HARD) {
-		randomTimeSlice = utils.GenerateRandomTime(int(utils.HARD_ARENA_SLOT), 22.0, 25.0)
-		carSlice, err = GiveRandomCar(aiOwnedArena.PlayerId, newArena.ArenaId, 4, 5, int(utils.HARD_ARENA_SLOT))
-		if err != nil {
-			return
-		}
-	}
-
-	for i, val := range randomTimeSlice {
-		newRecord := model.ArenaRaceRecord{
-			PlayerId: aiOwnedArena.PlayerId,
-			ArenaId:  newArena.ArenaId,
-			TimeWin:  fmt.Sprintf("%v", val),
-			CustId:   carSlice[i].CustId,
-			Result:   "win",
-		}
-
-		err := db.CreateRecord(&newRecord)
-		if err != nil {
-			response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-			return
-		}
+	err = utils.GiveArenaToAi(newArena.ArenaId, newArena.ArenaLevel)
+	if err != nil {
+		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+		return
 	}
 
 	response.ShowResponse(utils.ARENA_ADD_SUCCESS, utils.HTTP_OK, utils.SUCCESS, newArena, ctx)
@@ -313,78 +239,4 @@ func GetArenaTypes(ctx *gin.Context) {
 	dataresp.Data = arenaTypeList
 
 	response.ShowResponse(utils.DATA_FETCH_SUCCESS, utils.HTTP_OK, utils.SUCCESS, dataresp, ctx)
-}
-
-func GiveRandomCar(playerId string, arenaId string, min int64, max int64, slots int) ([]carDetails, error) {
-
-	var carSlice []carDetails
-	for i := 0; i < slots; i++ {
-		var carId string
-		query := ` SELECT car_id FROM cars
-					WHERE class >= ? AND class <= ?
-					ORDER BY RANDOM() LIMIT 1 ; `
-		err := db.QueryExecutor(query, &carId, min, max)
-		if err != nil {
-			return nil, errors.New("error in selecting the random car from the db for ai")
-		}
-		var carDefaults model.DefaultCustomisation
-		query = "SELECT * FROM default_customisations WHERE car_id=? "
-		err = db.QueryExecutor(query, &carDefaults, carId)
-		if err != nil {
-
-			return nil, err
-		}
-
-		playerCarCustomisations := model.PlayerCarCustomisation{
-			PlayerId:          playerId,
-			CarId:             carId,
-			CarLevel:          1,
-			Power:             carDefaults.Power,
-			Grip:              carDefaults.Grip,
-			ShiftTime:         carDefaults.ShiftTime,
-			Weight:            carDefaults.Weight,
-			OVR:               carDefaults.OVR,
-			Durability:        carDefaults.Durability,
-			NitrousTime:       carDefaults.NitrousTime,
-			ColorCategory:     carDefaults.ColorCategory,
-			ColorType:         carDefaults.ColorType,
-			ColorName:         carDefaults.ColorName,
-			WheelCategory:     carDefaults.WheelCategory,
-			WheelColorName:    carDefaults.WheelColorName,
-			InteriorColorName: carDefaults.InteriorColorName,
-			LPValue:           carDefaults.LPValue,
-		}
-
-		err = db.CreateRecord(&playerCarCustomisations)
-		if err != nil {
-			return nil, err
-		}
-
-		newCarRecord := model.OwnedCars{
-			PlayerId: playerId,
-			CustId:   playerCarCustomisations.CustId,
-			Selected: true,
-		}
-
-		err = db.CreateRecord(&newCarRecord)
-		if err != nil {
-			return nil, err
-		}
-		//Get the customisation id
-
-		carSlice = append(carSlice, carDetails{
-			CustId: playerCarCustomisations.CustId,
-			OVR:    carDefaults.OVR,
-		})
-	}
-
-	fmt.Println("Car slice before sorting is:", carSlice)
-
-	sort.SliceStable(carSlice, func(i, j int) bool {
-		return carSlice[i].OVR > carSlice[j].OVR
-	})
-
-	fmt.Println("Car slice is after sorting:", carSlice)
-
-	return carSlice, nil
 }

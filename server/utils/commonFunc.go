@@ -354,3 +354,145 @@ func CustomiseMapping(id string, tableName string) (*response.Customization, err
 
 	return &respCustomise, nil
 }
+
+type carDetails struct {
+	CustId string
+	OVR    float64
+}
+
+func GiveArenaToAi(arenaId string, arenaLevel int64) error {
+	var AIId string
+	query := "SELECT player_id FROM players WHERE role='ai' order by RANDOM() LIMIT 1;"
+	err := db.QueryExecutor(query, &AIId)
+	if err != nil {
+		return err
+	}
+
+	aiOwnedArena := model.PlayerRaceStats{
+		PlayerId: AIId,
+		ArenaId:  &arenaId,
+		WinTime:  time.Now(),
+		ArenaWon: true,
+	}
+
+	var randomTimeSlice []string
+	var carSlice []carDetails
+
+	if arenaLevel == int64(EASY) {
+		aiOwnedArena.WinStreak = EASY_ARENA_SERIES
+		randomTimeSlice = GenerateRandomTime(int(EASY_ARENA_SLOT), 22.0, 25.0)
+		carSlice, err = GiveRandomCar(aiOwnedArena.PlayerId, arenaId, 1, 2, int(EASY_ARENA_SLOT))
+		if err != nil {
+			return err
+		}
+	} else if arenaLevel == int64(MEDIUM) {
+		aiOwnedArena.WinStreak = MEDIUM_ARENA_SERIES
+		randomTimeSlice = GenerateRandomTime(int(MEDIUM_ARENA_SLOT), 22.0, 25.0)
+		carSlice, err = GiveRandomCar(aiOwnedArena.PlayerId, arenaId, 2, 4, int(MEDIUM_ARENA_SLOT))
+		if err != nil {
+			return err
+		}
+
+	} else if arenaLevel == int64(HARD) {
+		aiOwnedArena.WinStreak = HARD_ARENA_SERIES
+		randomTimeSlice = GenerateRandomTime(int(HARD_ARENA_SLOT), 22.0, 25.0)
+		carSlice, err = GiveRandomCar(aiOwnedArena.PlayerId, arenaId, 4, 5, int(HARD_ARENA_SLOT))
+		if err != nil {
+			return err
+		}
+	}
+
+	err = db.CreateRecord(&aiOwnedArena)
+	if err != nil {
+		return err
+	}
+
+	for i, val := range randomTimeSlice {
+		newRecord := model.ArenaRaceRecord{
+			PlayerId: aiOwnedArena.PlayerId,
+			ArenaId:  arenaId,
+			TimeWin:  fmt.Sprintf("%v", val),
+			CustId:   carSlice[i].CustId,
+			Result:   "win",
+		}
+
+		err := db.CreateRecord(&newRecord)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+func GiveRandomCar(playerId string, arenaId string, min int64, max int64, slots int) ([]carDetails, error) {
+
+	var carSlice []carDetails
+	for i := 0; i < slots; i++ {
+		var carId string
+		query := ` SELECT car_id FROM cars
+					WHERE class >= ? AND class <= ?
+					ORDER BY RANDOM() LIMIT 1 ; `
+		err := db.QueryExecutor(query, &carId, min, max)
+		if err != nil {
+			return nil, errors.New("error in selecting the random car from the db for ai")
+		}
+		var carDefaults model.DefaultCustomisation
+		query = "SELECT * FROM default_customisations WHERE car_id=? "
+		err = db.QueryExecutor(query, &carDefaults, carId)
+		if err != nil {
+
+			return nil, err
+		}
+
+		playerCarCustomisations := model.PlayerCarCustomisation{
+			PlayerId:          playerId,
+			CarId:             carId,
+			CarLevel:          1,
+			Power:             carDefaults.Power,
+			Grip:              carDefaults.Grip,
+			ShiftTime:         carDefaults.ShiftTime,
+			Weight:            carDefaults.Weight,
+			OVR:               carDefaults.OVR,
+			Durability:        carDefaults.Durability,
+			NitrousTime:       carDefaults.NitrousTime,
+			ColorCategory:     carDefaults.ColorCategory,
+			ColorType:         carDefaults.ColorType,
+			ColorName:         carDefaults.ColorName,
+			WheelCategory:     carDefaults.WheelCategory,
+			WheelColorName:    carDefaults.WheelColorName,
+			InteriorColorName: carDefaults.InteriorColorName,
+			LPValue:           carDefaults.LPValue,
+		}
+
+		err = db.CreateRecord(&playerCarCustomisations)
+		if err != nil {
+			return nil, err
+		}
+
+		newCarRecord := model.OwnedCars{
+			PlayerId: playerId,
+			CustId:   playerCarCustomisations.CustId,
+			Selected: true,
+		}
+
+		err = db.CreateRecord(&newCarRecord)
+		if err != nil {
+			return nil, err
+		}
+		//Get the customisation id
+
+		carSlice = append(carSlice, carDetails{
+			CustId: playerCarCustomisations.CustId,
+			OVR:    carDefaults.OVR,
+		})
+	}
+
+	fmt.Println("Car slice before sorting is:", carSlice)
+
+	sort.SliceStable(carSlice, func(i, j int) bool {
+		return carSlice[i].OVR > carSlice[j].OVR
+	})
+
+	fmt.Println("Car slice is after sorting:", carSlice)
+
+	return carSlice, nil
+}

@@ -1,11 +1,9 @@
 package main
 
 import (
-	"io"
 	"log"
 	"main/server"
 
-	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
 	"main/server/db"
@@ -32,7 +30,7 @@ func main() {
 	db.Transfer(connection)
 	socketServer := socket.SocketInit()
 	utils.SocketServerInstance = socketServer
-	//handler.StartCron(socketServer)
+	handler.StartCron(socketServer)
 	defer socketServer.Close()
 	app := server.NewServer(connection)
 	server.ConfigureRoutes(app, utils.SocketServerInstance)
@@ -43,9 +41,6 @@ func main() {
 	go auth.AddAiToDB()
 	go player.AddPlayerLevel()
 	go handler.AddShopDataToDB()
-
-	f, _ := os.Create("gin.log")
-	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 
 	if err := app.Run(os.Getenv("PORT")); err != nil {
 		log.Print(err)

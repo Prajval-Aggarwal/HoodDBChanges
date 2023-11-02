@@ -50,7 +50,7 @@ func SocketHandler(server *socketio.Server) {
 	server.OnEvent("/", "buyStore", gateway.SocketAuthMiddleware(shop.BuyFromShop))
 
 	//reward socket
-	server.OnEvent("/", "reward", gateway.SocketAuthMiddleware(socket.Open))
+	server.OnEvent("/", "open", gateway.SocketAuthMiddleware(socket.Open))
 	server.OnEvent("/", "close", gateway.SocketAuthMiddleware(socket.Close))
 
 }

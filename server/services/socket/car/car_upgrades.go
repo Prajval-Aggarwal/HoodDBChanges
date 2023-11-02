@@ -74,7 +74,7 @@ func UpgradeCarService(s socketio.Conn, reqData map[string]interface{}) {
 	if carDetails.CarLevel == int64(maxLevel) {
 		// isUpgradable = false
 		//part cannnot be upgraded further
-		response.SocketResponse(utils.UPGRADE_REACHED_MAX_LEVEL, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "ack", s)
+		response.SocketResponse(utils.UPGRADE_REACHED_MAX_LEVEL, utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, "carUpgrade", s)
 		return
 	}
 

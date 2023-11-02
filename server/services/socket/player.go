@@ -36,7 +36,6 @@ SELECT
                 ELSE 0
             END
     ) AS ArenaCount,
-    SUM(prh.distance_traveled) AS TotalDistanceTraveled,
     (SELECT xp_required FROM player_levels WHERE level = p.level + 1) AS NextXPRequired,
     (SELECT xp_required FROM player_levels WHERE level = p.level) AS PrevXP,
     SUM(prh.shd_won) AS TotalShowDownWon,

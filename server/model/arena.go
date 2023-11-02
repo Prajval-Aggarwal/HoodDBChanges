@@ -69,10 +69,12 @@ type Arena struct {
 type ArenaReward struct {
 	Id             string    `json:"id" gorm:"unique;default:uuid_generate_v4();primaryKey,omitempty"`
 	ArenaId        string    `json:"arenaId"`
+	Arena          Arena     `josn:"-" gorm:"references:ArenaId;constraint:OnDelete:CASCADE"`
 	PlayerId       string    `json:"playerId"`
+	Player         Player    `json:"-" gorm:"references:PlayerId;constraint:OnDelete:CASCADE"`
 	Coins          int64     `json:"coins"`
 	Cash           int64     `json:"cash"`
-	RepairCurrency int64     `json:"repairCurrency"`
+	RepairCurrency int64     `json:"repairParts"`
 	RewardTime     time.Time `json:"rewardTime"`
 	NextRewardTime time.Time `json:"nextRewardTime"`
 	CreatedAt      time.Time
