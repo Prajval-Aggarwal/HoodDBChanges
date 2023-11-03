@@ -19,7 +19,9 @@ func StartCron(server *socketio.Server) {
 	//check the next reward time is same as current time. If yes give the rewards
 	c.AddFunc("*/1 * * * *", func() {
 		fmt.Println(".....................Cron hit..................................")
-		socket.GiveArenaPerks2(server)
+		t := time.Now()
+		fmt.Println("time is ,", t)
+		socket.GiveArenaPerks2(server, t)
 	})
 
 	// c.AddFunc("*/6 * * * *", func() {

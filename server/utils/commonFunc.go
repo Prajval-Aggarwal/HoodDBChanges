@@ -496,3 +496,21 @@ func GiveRandomCar(playerId string, arenaId string, min int64, max int64, slots 
 
 	return carSlice, nil
 }
+
+func RoundTimeToMinute(t time.Time) time.Time {
+	// Check the seconds component of the time
+	seconds := t.Second()
+
+	// If seconds are greater than or equal to 30, round up to the next minute
+	if seconds >= 30 {
+		t = t.Add(time.Second * time.Duration(60-seconds))
+	} else {
+		// If seconds are less than 30, round down to the current minute
+		t = t.Add(-time.Second * time.Duration(seconds))
+	}
+
+	// Zero out the seconds
+	t = t.Add(-time.Second * time.Duration(t.Second()))
+
+	return t
+}

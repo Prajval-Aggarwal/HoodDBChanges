@@ -20,7 +20,7 @@ type PerkResposne struct {
 	NextRewardTime string `json:"nextRewardTime"`
 }
 
-func GiveArenaPerks2(server *socketio.Server) {
+func GiveArenaPerks2(server *socketio.Server, tm time.Time) {
 
 	var tempRes []struct {
 		Id             string
@@ -32,12 +32,18 @@ func GiveArenaPerks2(server *socketio.Server) {
 	// query := `SELECT ar.player_id,ar.arena_id,a.arena_level FROM arena_rewards ar JOIN arenas a ON ar.arena_id=a.arena_id WHERE next_reward_time= CURRENT_TIMESTAMP`
 
 	query := `
-	SELECT ar.*,a.arena_level FROM arena_rewards ar JOIN arenas a ON ar.arena_id=a.arena_id WHERE 
-	EXTRACT(SECOND FROM ar.next_reward_time - CURRENT_TIMESTAMP) <=0 AND
-	EXTRACT(MINUTE FROM ar.next_reward_time - CURRENT_TIMESTAMP) <=0 AND
-	EXTRACT(HOUR FROM   ar.next_reward_time - CURRENT_TIMESTAMP) =0
-
+	SELECT ar.*, a.arena_level
+	FROM arena_rewards ar
+	JOIN arenas a ON ar.arena_id = a.arena_id
+	WHERE
+	date_trunc('minute', ar.next_reward_time) = date_trunc('minute', CURRENT_TIMESTAMP);
 	`
+
+	// query := `SELECT ar.*, a.arena_level
+	// FROM arena_rewards ar
+	// JOIN arenas a ON ar.arena_id = a.arena_id
+	// WHERE
+	// ar.next_reward_time - ? < 0 `
 
 	// query = "SELECT ar.*,a.level FROM arena_rewards  JOIN arenas a ON ar.arena_id= a.arena_id WHERE next_reward_time= CURRENT_TIMESTAMP"
 
@@ -47,19 +53,25 @@ func GiveArenaPerks2(server *socketio.Server) {
 		return
 	}
 
-	fmt.Println("Data is", tempRes)
+	fmt.Printf("Data is%+v", tempRes)
+
 	if len(tempRes) != 0 {
 		for _, temp := range tempRes {
 
+			// if tm.Sub(temp.NextRewardTime) {
+
+			// }
+			currentTime := time.Now()
+			newTime := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), currentTime.Hour(), currentTime.Minute(), 0, 0, time.Local)
 			var nextTime time.Time
 
 			switch int64(temp.ArenaLevel) {
 			case int64(utils.EASY):
-				nextTime = time.Now().Add(time.Duration(utils.EASY_PERK_MINUTES) * time.Minute)
+				nextTime = newTime.Add(time.Duration(utils.EASY_PERK_MINUTES) * time.Minute)
 			case int64(utils.MEDIUM):
-				nextTime = time.Now().Add(time.Duration(utils.MEDIUM_PERK_MINUTES) * time.Minute)
+				nextTime = newTime.Add(time.Duration(utils.MEDIUM_PERK_MINUTES) * time.Minute)
 			case int64(utils.HARD):
-				nextTime = time.Now().Add(time.Duration(utils.HARD_PERK_MINUTES) * time.Minute)
+				nextTime = newTime.Add(time.Duration(utils.HARD_PERK_MINUTES) * time.Minute)
 
 			}
 
@@ -81,7 +93,7 @@ func GiveArenaPerks2(server *socketio.Server) {
 			arenaRewards.Coins += arenaPerks.Coins
 			arenaRewards.Cash += arenaPerks.Cash
 			arenaRewards.RepairCurrency += arenaPerks.RepairParts
-			arenaRewards.RewardTime = time.Now()
+			arenaRewards.RewardTime = newTime
 			arenaRewards.NextRewardTime = nextTime
 
 			//update arena reards details
@@ -134,7 +146,7 @@ func GiveArenaPerks2(server *socketio.Server) {
 
 		}
 	} else {
-		fmt.Println("No on owns the arena")
+		fmt.Println("  No on owns the arena")
 		return
 	}
 

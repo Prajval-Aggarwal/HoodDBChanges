@@ -44,7 +44,7 @@ func GetArenaSlotDetailsService(ctx *gin.Context, playerId string, arenaId strin
 	}
 
 	// temp := time.Until(arenaWinTime.Add(24 * time.Hour))
-	temp := time.Until(arenaWinTime.Add(3 * time.Minute))
+	temp := time.Until(arenaWinTime.Add(30 * time.Minute))
 
 	// temp := arenaWinTime.Add(24 * time.Hour).Sub(time.Now())
 	arenaSlotData.ArenaWinTime = temp.String()

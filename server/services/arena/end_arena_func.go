@@ -25,6 +25,7 @@ func UpdateArenaOwnedData(endChallReq request.EndChallengeReq, playerId2 string,
 		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 		return err
 	}
+	currentTime := time.Now()
 
 	newRecord := model.ArenaReward{
 		ArenaId:        endChallReq.ArenaId,
@@ -32,16 +33,16 @@ func UpdateArenaOwnedData(endChallReq request.EndChallengeReq, playerId2 string,
 		Coins:          0,
 		Cash:           0,
 		RepairCurrency: 0,
-		RewardTime:     time.Now(),
+		RewardTime:     time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), currentTime.Hour(), currentTime.Minute(), 0, 0, time.Local),
 	}
 
 	switch int64(arenaDetails.ArenaLevel) {
 	case int64(utils.EASY):
-		newRecord.NextRewardTime = time.Now().Add(time.Duration(utils.EASY_PERK_MINUTES) * time.Minute)
+		newRecord.NextRewardTime = newRecord.RewardTime.Add(time.Duration(utils.EASY_PERK_MINUTES) * time.Minute)
 	case int64(utils.MEDIUM):
-		newRecord.NextRewardTime = time.Now().Add(time.Duration(utils.MEDIUM_PERK_MINUTES) * time.Minute)
+		newRecord.NextRewardTime = newRecord.RewardTime.Add(time.Duration(utils.MEDIUM_PERK_MINUTES) * time.Minute)
 	case int64(utils.HARD):
-		newRecord.NextRewardTime = time.Now().Add(time.Duration(utils.HARD_PERK_MINUTES) * time.Minute)
+		newRecord.NextRewardTime = newRecord.RewardTime.Add(time.Duration(utils.HARD_PERK_MINUTES) * time.Minute)
 
 	}
 

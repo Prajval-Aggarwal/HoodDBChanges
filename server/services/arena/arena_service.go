@@ -18,20 +18,16 @@ import (
 )
 
 func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, playerId2 string) {
+
+	fmt.Printf("Request Body is :%+v", endChallReq)
+	fmt.Println("")
+
 	//converting the given input to format "00:00:05.1455"
 	TimeInString := fmt.Sprintf("00:00:%02d.%02d%02d", int(endChallReq.Seconds), int(endChallReq.MilliSec), int(endChallReq.MicroSec))
 
-	//fmt.Println("Time in string", TimeInString)
-	winTime, err := utils.TimeConversion(TimeInString)
-	if err != nil {
-		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-		return
-	}
-	//fmt.Println("Win time is", winTime)
-
 	var raceType model.RaceTypes
 	query := "SELECT * FROM race_types WHERE race_id=?"
-	err = db.QueryExecutor(query, &raceType, endChallReq.RaceId)
+	err := db.QueryExecutor(query, &raceType, endChallReq.RaceId)
 	if err != nil {
 		response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
 		return
@@ -62,17 +58,42 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 			return // Error handling will be done in the defer block
 		}
 
-		opponentTime, err := utils.TimeConversion(oppTimeStringFormat)
-		if err != nil {
-			response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-			return // Error handling will be done in the defer block
-		}
 		var rewards model.RaceRewards
 		win := false
 
+		var raceWon bool
+
+		parts := strings.Split(oppTimeStringFormat, ":")
+		subParts := strings.Split(parts[2], ".")
+		seconds, _ := strconv.Atoi(subParts[0])
+
+		milliSecond, _ := strconv.Atoi(subParts[1][:2])
+
+		microSecond, _ := strconv.Atoi(subParts[1][2:])
+
+		if endChallReq.Seconds > int64(seconds) {
+			raceWon = false
+		} else if endChallReq.Seconds < int64(seconds) {
+			raceWon = true
+		} else {
+			if endChallReq.MilliSec > int64(milliSecond) {
+				raceWon = false
+			} else if endChallReq.MilliSec < int64(milliSecond) {
+				raceWon = true
+			} else {
+				if endChallReq.MicroSec > int64(microSecond) {
+					raceWon = false
+				} else if endChallReq.MicroSec < int64(microSecond) {
+					raceWon = true
+				} else {
+					raceWon = false
+				}
+			}
+		}
+
 		query = "SELECT * FROM race_rewards WHERE race_id=? AND status=?"
 
-		if winTime.Before(*opponentTime) {
+		if raceWon {
 
 			fmt.Println("Wins the challenge outside the arena")
 			win = true
@@ -259,16 +280,49 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 			}
 
 		}
-		opponentTime, err := utils.TimeConversion(oppTimeStringFormat[(winCount + lostCount)])
-		if err != nil {
 
-			response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-			return
+		var oppSeconds []int64
+		var oppMilliSec []int64
+		var oppMicroSec []int64
+
+		var raceWon bool
+
+		for _, ts := range oppTimeStringFormat {
+			parts := strings.Split(ts, ":")
+			subParts := strings.Split(parts[2], ".")
+			seconds, _ := strconv.Atoi(subParts[0])
+			oppSeconds = append(oppSeconds, int64(seconds))
+			milliSecond, _ := strconv.Atoi(subParts[1][:2])
+			oppMilliSec = append(oppMilliSec, int64(milliSecond))
+
+			microSecond, _ := strconv.Atoi(subParts[1][2:])
+			oppMicroSec = append(oppMicroSec, int64(microSecond))
+
 		}
-		fmt.Println("Compared opponent time is:", *opponentTime)
-		if winTime.Before(*opponentTime) {
 
-			fmt.Println("Compared opponent time is:", opponentTime)
+		if endChallReq.Seconds > oppSeconds[winCount+lostCount] {
+			raceWon = false
+		} else if endChallReq.Seconds < oppSeconds[winCount+lostCount] {
+			raceWon = true
+		} else {
+			if endChallReq.MilliSec > oppMilliSec[winCount+lostCount] {
+				raceWon = false
+			} else if endChallReq.MilliSec < oppMilliSec[winCount+lostCount] {
+				raceWon = true
+			} else {
+				if endChallReq.MicroSec > oppMicroSec[winCount+lostCount] {
+					raceWon = false
+				} else if endChallReq.MicroSec < oppMicroSec[winCount+lostCount] {
+					raceWon = true
+				} else {
+					raceWon = false
+				}
+			}
+		}
+
+		fmt.Println("Race status is", raceWon)
+		if raceWon {
+
 			fmt.Println("player won in arena")
 			//player wins the a series in arena
 			//add the count to arenaRaceWins
@@ -309,9 +363,9 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 					return
 				}
-				fmt.Printf("test is%+v", test)
+				// fmt.Printf("test is%+v", test)
 				fmt.Println("")
-				fmt.Printf("arena series%+v", arenaSeries)
+				// fmt.Printf("arena series%+v", arenaSeries)
 				fmt.Println("")
 				if (arenaSeries.WinStreak+arenaSeries.LoseStreak) == test.RaceSeries && (arenaSeries.WinStreak > arenaSeries.LoseStreak) {
 					//player won the arena
@@ -348,43 +402,43 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 						return
 					}
 
-					fmt.Printf("TempRecords are%+v", tempRecords)
+					// fmt.Printf("TempRecords are%+v", tempRecords)
 					fmt.Println()
 
-					for _, rec := range tempRecords {
-						query = "UPDATE arena_race_records SET player_id=? ,time_win=?,result=?,cust_id=? WHERE player_id=? AND arena_id=?"
-						err = db.RawExecutor(query, playerId2, rec.TimeWin, rec.Result, rec.CustId, endChallReq.PlayerId1, endChallReq.ArenaId)
-						if err != nil {
-							response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-							return
-						}
-					}
-
-					//update is not working so first deleteing those reords and then add new records
-
-					// query = "DELETE FROM  arena_race_records  WHERE player_id=? AND arena_id=?"
-					// err = db.RawExecutor(query, endChallReq.PlayerId1, endChallReq.ArenaId)
-					// if err != nil {
-					// 	response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-					// 	return
-					// }
-
 					// for _, rec := range tempRecords {
-
-					// 	newRecord := model.ArenaRaceRecord{
-					// 		PlayerId: playerId2,
-					// 		ArenaId:  endChallReq.ArenaId,
-					// 		TimeWin:  rec.TimeWin,
-					// 		Result:   rec.Result,
-					// 		CustId:   rec.CustId,
-					// 	}
-
-					// 	err = db.CreateRecord(&newRecord)
+					// 	query = "UPDATE arena_race_records SET player_id=? ,time_win=?,result=?,cust_id=? WHERE player_id=? AND arena_id=?"
+					// 	err = db.RawExecutor(query, playerId2, rec.TimeWin, rec.Result, rec.CustId, endChallReq.PlayerId1, endChallReq.ArenaId)
 					// 	if err != nil {
 					// 		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 					// 		return
 					// 	}
 					// }
+
+					//update is not working so first deleteing those reords and then add new records
+
+					query = "DELETE FROM  arena_race_records  WHERE player_id=? AND arena_id=?"
+					err = db.RawExecutor(query, endChallReq.PlayerId1, endChallReq.ArenaId)
+					if err != nil {
+						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+						return
+					}
+
+					for _, rec := range tempRecords {
+
+						newRecord := model.ArenaRaceRecord{
+							PlayerId: playerId2,
+							ArenaId:  endChallReq.ArenaId,
+							TimeWin:  rec.TimeWin,
+							Result:   rec.Result,
+							CustId:   rec.CustId,
+						}
+
+						err = db.CreateRecord(&newRecord)
+						if err != nil {
+							response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+							return
+						}
+					}
 
 					query = "DELETE FROM  temp_race_records  WHERE player_id=? AND arena_id=?"
 					err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
@@ -404,11 +458,18 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 						response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
 						return
 					}
+
+					utils.SocketServerInstance.BroadcastToRoom("/", endChallReq.PlayerId1, "arenaLost", response.Success{
+						Status:  utils.SUCCESS,
+						Code:    utils.HTTP_OK,
+						Message: "Arena owned by other player",
+						Data:    nil,
+					})
 					//give both rewards arena and takedown
 					response.ShowResponse(utils.WON, utils.HTTP_OK, utils.SUCCESS, totalRewards, ctx)
 
 					//it should be 24 hours
-					time.AfterFunc(3*time.Minute, func() {
+					time.AfterFunc(30*time.Minute, func() {
 
 						fmt.Println("time is:", time.Now())
 						count := 0
@@ -465,6 +526,13 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 								response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 								return
 							}
+
+							utils.SocketServerInstance.BroadcastToRoom("/", playerId2, "arenaLost", response.Success{
+								Status:  utils.SUCCESS,
+								Code:    utils.HTTP_OK,
+								Message: "Arena lost because car slots were not filled",
+								Data:    nil,
+							})
 
 						}
 					})
@@ -793,42 +861,42 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 					return
 				}
 
-				fmt.Println("TempRecords are", tempRecords)
-
-				for _, rec := range tempRecords {
-					query = "UPDATE arena_race_records SET player_id=? ,time_win=?,result=?,cust_id=? WHERE player_id=? AND arena_id=?"
-					err = db.RawExecutor(query, playerId2, rec.TimeWin, rec.Result, rec.CustId, endChallReq.PlayerId1, endChallReq.ArenaId)
-					if err != nil {
-						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-						return
-					}
-				}
-
-				//update is not working so first deleteing those reords and then add new records
-
-				// query = "DELETE FROM  arena_race_records  WHERE player_id=? AND arena_id=?"
-				// err = db.RawExecutor(query, endChallReq.PlayerId1, endChallReq.ArenaId)
-				// if err != nil {
-				// 	response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-				// 	return
-				// }
+				// fmt.Println("TempRecords are", tempRecords)
 
 				// for _, rec := range tempRecords {
-
-				// 	newRecord := model.ArenaRaceRecord{
-				// 		PlayerId: playerId2,
-				// 		ArenaId:  endChallReq.ArenaId,
-				// 		TimeWin:  rec.TimeWin,
-				// 		Result:   rec.Result,
-				// 		CustId:   rec.CustId,
-				// 	}
-
-				// 	err = db.CreateRecord(&newRecord)
+				// 	query = "UPDATE arena_race_records SET player_id=? ,time_win=?,result=?,cust_id=? WHERE player_id=? AND arena_id=?"
+				// 	err = db.RawExecutor(query, playerId2, rec.TimeWin, rec.Result, rec.CustId, endChallReq.PlayerId1, endChallReq.ArenaId)
 				// 	if err != nil {
 				// 		response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
 				// 		return
 				// 	}
 				// }
+
+				//update is not working so first deleteing those reords and then add new records
+
+				query = "DELETE FROM  arena_race_records  WHERE player_id=? AND arena_id=?"
+				err = db.RawExecutor(query, endChallReq.PlayerId1, endChallReq.ArenaId)
+				if err != nil {
+					response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+					return
+				}
+
+				for _, rec := range tempRecords {
+
+					newRecord := model.ArenaRaceRecord{
+						PlayerId: playerId2,
+						ArenaId:  endChallReq.ArenaId,
+						TimeWin:  rec.TimeWin,
+						Result:   rec.Result,
+						CustId:   rec.CustId,
+					}
+
+					err = db.CreateRecord(&newRecord)
+					if err != nil {
+						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+						return
+					}
+				}
 				query = "DELETE FROM  temp_race_records  WHERE player_id=? AND arena_id=?"
 				err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
 				if err != nil {
@@ -862,7 +930,14 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 					return
 				}
 
-				time.AfterFunc(3*time.Minute, func() {
+				utils.SocketServerInstance.BroadcastToRoom("/", endChallReq.PlayerId1, "arenaLost", response.Success{
+					Status:  utils.SUCCESS,
+					Code:    utils.HTTP_OK,
+					Message: "Arena owned by other player",
+					Data:    nil,
+				})
+
+				time.AfterFunc(30*time.Minute, func() {
 
 					fmt.Println("time is:", time.Now())
 					count := 0
