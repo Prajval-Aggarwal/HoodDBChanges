@@ -33,6 +33,7 @@ func GiveArenaPerks2(server *socketio.Server) {
 
 	query := `
 	SELECT ar.*,a.arena_level FROM arena_rewards ar JOIN arenas a ON ar.arena_id=a.arena_id WHERE 
+	EXTRACT(SECOND FROM ar.next_reward_time - CURRENT_TIMESTAMP) <=0 AND
 	EXTRACT(MINUTE FROM ar.next_reward_time - CURRENT_TIMESTAMP) <=0 AND
 	EXTRACT(HOUR FROM   ar.next_reward_time - CURRENT_TIMESTAMP) =0
 

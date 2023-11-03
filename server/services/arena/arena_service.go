@@ -408,7 +408,7 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 					response.ShowResponse(utils.WON, utils.HTTP_OK, utils.SUCCESS, totalRewards, ctx)
 
 					//it should be 24 hours
-					time.AfterFunc(30*time.Minute, func() {
+					time.AfterFunc(3*time.Minute, func() {
 
 						fmt.Println("time is:", time.Now())
 						count := 0
@@ -447,6 +447,13 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 							}
 
 							query = "UPDATE player_race_stats SET arena_won=false WHERE player_id=? AND arena_id=?"
+							err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
+							if err != nil {
+								response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+								return
+							}
+
+							query = "DELETE FROM arena_cars WHERE player_id=? AND arena_id=?"
 							err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
 							if err != nil {
 								response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
@@ -855,6 +862,67 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 					return
 				}
 
+				time.AfterFunc(3*time.Minute, func() {
+
+					fmt.Println("time is:", time.Now())
+					count := 0
+					query := "SELECT COUNT(*) FROM arena_cars WHERE player_id=? AND arena_id=?"
+					err = db.QueryExecutor(query, &count, playerId2, endChallReq.ArenaId)
+					if err != nil {
+						response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
+						return
+					}
+					var requiredSlots int64
+
+					switch arenaDetails.ArenaLevel {
+					case int64(utils.EASY):
+						requiredSlots = utils.EASY_ARENA_SLOT
+					case int64(utils.MEDIUM):
+						requiredSlots = utils.MEDIUM_ARENA_SLOT
+					case int64(utils.HARD):
+						requiredSlots = utils.HARD_ARENA_SLOT
+					}
+
+					if count != int(requiredSlots) {
+						// give the arena back to AI
+
+						query = "DELETE FROM arena_rewards WHERE player_id=? AND arena_id=?"
+						err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
+						if err != nil {
+							response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+							return
+						}
+
+						query = "DELETE FROM arena_race_records WHERE player_id=? AND arena_id=?"
+						err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
+						if err != nil {
+							response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+							return
+						}
+
+						query = "UPDATE player_race_stats SET arena_won=false WHERE player_id=? AND arena_id=?"
+						err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
+						if err != nil {
+							response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+							return
+						}
+						query = "DELETE FROM arena_cars WHERE player_id=? AND arena_id=?"
+						err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
+						if err != nil {
+							response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+							return
+						}
+
+						err = utils.GiveArenaToAi(endChallReq.ArenaId, arenaDetails.ArenaLevel)
+						if err != nil {
+							response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
+							return
+						}
+
+					} else {
+						fmt.Println("Player has filled all the slot")
+					}
+				})
 			}
 
 			if playerLevel != nil {
@@ -888,61 +956,6 @@ func EndChallengeService(ctx *gin.Context, endChallReq request.EndChallengeReq, 
 			}
 			response.ShowResponse(utils.LOSE, utils.HTTP_OK, utils.SUCCESS, totalRewards, ctx)
 
-			time.AfterFunc(30*time.Minute, func() {
-
-				fmt.Println("time is:", time.Now())
-				count := 0
-				query := "SELECT COUNT(*) FROM arena_cars WHERE player_id=? AND arena_id=?"
-				err = db.QueryExecutor(query, &count, playerId2, endChallReq.ArenaId)
-				if err != nil {
-					response.ShowResponse(err.Error(), utils.HTTP_BAD_REQUEST, utils.FAILURE, nil, ctx)
-					return
-				}
-				var requiredSlots int64
-
-				switch arenaDetails.ArenaLevel {
-				case int64(utils.EASY):
-					requiredSlots = utils.EASY_ARENA_SLOT
-				case int64(utils.MEDIUM):
-					requiredSlots = utils.MEDIUM_ARENA_SLOT
-				case int64(utils.HARD):
-					requiredSlots = utils.HARD_ARENA_SLOT
-				}
-
-				if count != int(requiredSlots) {
-					// give the arena back to AI
-
-					query = "DELETE FROM arena_rewards WHERE player_id=? AND arena_id=?"
-					err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
-					if err != nil {
-						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-						return
-					}
-
-					query = "DELETE FROM arena_race_records WHERE player_id=? AND arena_id=?"
-					err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
-					if err != nil {
-						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-						return
-					}
-
-					query = "UPDATE player_race_stats SET arena_won=false WHERE player_id=? AND arena_id=?"
-					err = db.RawExecutor(query, playerId2, endChallReq.ArenaId)
-					if err != nil {
-						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-						return
-					}
-
-					err = utils.GiveArenaToAi(endChallReq.ArenaId, arenaDetails.ArenaLevel)
-					if err != nil {
-						response.ShowResponse(err.Error(), utils.HTTP_INTERNAL_SERVER_ERROR, utils.FAILURE, nil, ctx)
-						return
-					}
-
-				} else {
-					fmt.Println("Player has filled all the slot")
-				}
-			})
 		}
 
 		playerResponse, _ := socket.GetPlayerDetailsCopy(playerId2)
